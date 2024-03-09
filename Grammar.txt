@@ -1,0 +1,121 @@
+startRule
+	: def_main
+	| def_function
+	| declarations
+	;
+
+def_main
+ 	: '#def' 'main' ':'
+ 		declarations
+	|	(def_function)*
+	|	code_block
+ 	;
+
+def_function
+	: 'def' identifier '(' formal_pars ')' ':'
+	'#{'
+		declarations
+		(globals)*
+		(def_function)*
+		code_block
+ 	'#}'
+	;
+
+declarations
+	: '#int' identifier
+	;
+formal_pars 
+	: identifier 
+	| identifier "«,»" formal_pars
+	;
+---
+
+statement 
+	: assignment_statement
+	| if_statement 
+	| while_statement
+	| return_statement 
+	| print_statement 
+	| input_statement
+	;
+
+assignment_statement 
+	: identifier "=" expression
+	;
+
+if_statement 
+	:"if" condition ":" 
+	 code_block
+	 (elif_statement)*
+	 (else_statement)*
+	;
+
+elif_statement 
+	: "elif" condition ":" 
+	  code_block
+	;
+
+else_statement 
+	: "else" ":" 
+	  code_block
+	;
+
+while_statement 
+	: "while" condition ":" 
+	'#{'
+	  code_block
+	'#}'
+	;
+
+return_statement 
+	: "return" expression
+	;
+
+print_statement 
+	: "print" "(" expression ")"
+	;
+
+input_statement 
+	: identifier "=" "int" "(" "input" "(" ")" ")"
+	;
+
+---
+
+code_block 
+	: statement 
+	| statement code_block
+	;
+
+condition
+ : bool_term ( 'or' bool_term )*
+
+ bool_term
+ : bool_factor ( 'and' bool_factor )*
+
+ bool_factor
+ : 'not' condition
+ | condition
+ | expression REL_OP expression
+
+expression 
+	: optional_sign term 
+	| expression "+" term 
+	| expression "-" term
+
+optional_sign
+	: '+'
+	| '-'
+	| 
+
+term 
+	: factor 
+	| term "*" factor 
+	| term "//" factor 
+	| term "%" factor
+
+factor 
+	: identifier 
+	| "(" expression ")"
+
+
+
