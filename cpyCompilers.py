@@ -244,8 +244,8 @@ class LexicalAnalyzer:
                         index += 1
                     if index < len(fileContent) - 1:
                         index += 2 
-                    finalWord += [token] + ['comment']
-                    state = self.STATES['stateOK']
+                    #finalWord += [token] + ['comment']
+                    state = self.STATES['stateBegin']
                 
                 
                 
