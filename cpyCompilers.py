@@ -46,6 +46,7 @@ class LexicalAnalyzer:
         alpha = False
         digit = False
         col = 0
+        counter = 0
         #the keyword that can not be the same with any variable 
         keywords=['main', 'def','#def','#int','global','if','elif','else','while','print','return','input','int','and','or','not']
         token = '' 
@@ -272,8 +273,9 @@ class LexicalAnalyzer:
                 if token:
                     self.tokens.append(Token(token,finalWord[1]))
                 token = ''
+                counter += 1
                 compilationFile.write("---------------------------------------------------------\n")
-                compilationFile.write("("+finalWord[0] + " -> " + finalWord[1] +")\n")
+                compilationFile.write("{ "+finalWord[0] + " -> " + finalWord[1] +" }"+ "\nToken number: "+ str(counter) +"\n")
                 compilationFile.write("---------------------------------------------------------\n")
                 finalWord = []
                 state = self.STATES['stateBegin']
