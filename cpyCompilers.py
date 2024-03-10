@@ -352,10 +352,14 @@ class SyntaxAnalyzer:
 
     def def_main(self):
         self.tokenCheck('main')
-        self.tokenCheck(':')
-        self.declarations()
+        # self.tokenCheck(':')
+        
         while self.currentToken.token == 'def':
             self.def_function()
+        while self.currentToken.token == '#int':
+            self.tokenCheck('#int')
+            self.declarations()
+        # self.declarations()
         self.code_block()
 
     def def_function(self):
