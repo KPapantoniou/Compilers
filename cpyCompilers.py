@@ -581,7 +581,8 @@ class SyntaxAnalyzer:
     
     def syntaxCorect(self):
         if self.currentToken.tokenType == 'EOF':
-            print('\n\nSyntax is correct\n\n')
+            print("\n\nEnding Token: "+self.currentToken.token)
+            print('Syntax is correct\n\n')
 
 
   
