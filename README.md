@@ -1,2 +1,2 @@
 # Compilers
-Compilers for cse.uoi
+Compilers for cse.uoi course 
