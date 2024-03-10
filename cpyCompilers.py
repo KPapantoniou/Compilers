@@ -373,18 +373,9 @@ class SyntaxAnalyzer:
             self.tokenCheck('global')
             if self.currentToken.tokenType == 'identifier':
                     self.nextToken()
-
-
-        # while self.currentToken.token in ['global', 'def']:
-        #     if self.currentToken.token == 'global':
-        #         self.tokenCheck('global')
-        #         if self.currentToken.tokenType == 'identifier':
-        #             self.nextToken()
-            # elif self.currentToken.token == 'def':
-            #     self.tokenCheck('def')
-            #     self.def_function()
-
-        #self.assignment_statements()
+        if self.currentToken.token == 'def':
+            self.tokenCheck('def')
+            self.def_function()
     
         self.code_block()
         self.tokenCheck('#}')
@@ -501,6 +492,10 @@ class SyntaxAnalyzer:
             if self.currentToken.tokenType == 'CompareOperation':
                 self.nextToken()
                 self.condition()
+        elif self.currentToken.token in ['(',')']:
+            self.tokenCheck('(')
+            self.condition()
+            self.tokenCheck(')')
         elif self.currentToken.tokenType == 'identifier':
             self.nextToken()
             self.condition()
