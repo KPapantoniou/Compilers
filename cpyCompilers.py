@@ -155,17 +155,15 @@ class LexicalAnalyzer:
                 if (digit):
                     token += currentCharacter
                     intToken = int(token)
-                    if(intToken>=-32767 and intToken<=32767):                    
-                        state = self.STATES['stateDigit']
-
-                    else:
-                     
+                    if(intToken<=-32767 and intToken>=32767):                    
                          print("Error: Number must be between -32767 and 32767")
                          print('Line: %d:%d'%(line,col))
                          state = self.STATES['stateERROR']
-            
+                    
+                    state = self.STATES['stateDigit']
                 else:
                     state = self.STATES['stateOK']
+                    index -= 1
                     finalWord += [token] + ['number']
 
         
