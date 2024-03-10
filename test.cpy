@@ -52,7 +52,7 @@ def max3(x,y,z):
 
 
 def fib(x):
-#{
+#{SsSssSS
     global counterFunctionCalls
     counterFunctionCalls = counterFunctionCalls + 1
     if x<0:

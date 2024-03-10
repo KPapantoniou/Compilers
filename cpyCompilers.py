@@ -102,16 +102,16 @@ class LexicalAnalyzer:
                     state = self.STATES['stateOK']
                     token = currentCharacter
                     if currentCharacter == '+':
-                        finalWord += [token] + ['Arithmetic_Operator']
+                        finalWord += [token] + ['ArithmeticOperation']
                         state = self.STATES['stateOK']
                     elif currentCharacter == '-':
-                        finalWord += [token] + ['Arithmetic_Operator']
+                        finalWord += [token] + ['ArithmeticOperation']
                         state = self.STATES['stateOK']
                     elif currentCharacter == '*':
-                        finalWord += [token] + ['Arithmetic_Operator']
+                        finalWord += [token] + ['ArithmeticOperation']
                         state = self.STATES['stateOK']
                     elif currentCharacter == '%':
-                        finalWord += [token] + ['Arithmetic_Operator']
+                        finalWord += [token] + ['ArithmeticOperation']
                         state = self.STATES['stateOK']
                     elif currentCharacter == ',':
                         finalWord += [token] + ['delimiter']
@@ -492,16 +492,86 @@ class SyntaxAnalyzer:
             if self.currentToken.tokenType == 'CompareOperation':
                 self.nextToken()
                 self.condition()
-        elif self.currentToken.token in ['(',')']:
-            self.tokenCheck('(')
+    def condition(self):
+        self.bool_term()
+        while self.currentToken.token == 'or':
+            self.tokenCheck('or')
+            self.bool_term()
+
+    def bool_term(self):
+        self.bool_factor()
+        while self.currentToken.token == 'and':
+            self.tokenCheck('and')
+            self.bool_factor()
+
+    def bool_factor(self):
+        if self.currentToken.token == 'not':
+            self.tokenCheck('not')
             self.condition()
-            self.tokenCheck(')')
+        elif self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
+            if self.currentToken.tokenType == 'CompareOperation':
+                self.nextToken()
+                self.condition()
+        elif self.currentToken.token in ['(',')']:
+            #self.tokenCheck('(')
+            self.nextToken()
+            self.condition()
+            #self.tokenCheck(')')
         elif self.currentToken.tokenType == 'identifier':
             self.nextToken()
             self.condition()
         elif self.currentToken.tokenType == 'number':
             self.nextToken()
             self.condition()
+        elif self.currentToken.tokenType == 'ArithmeticOperation': 
+            #self.nextToken()
+            self.expression()
+            self.condition()
+        else:
+            print(f"Syntax error: expected not, <, >, ==, !=, <=, >=, or identifier received {self.currentToken.token}")
+            print(f"Line : {self.tokenIndex}")
+
+    def expression(self):
+        self.optional_sign()
+        self.term()
+        while self.currentToken.token in ['+', '-']:
+            if self.currentToken.token == '+':
+                self.tokenCheck('+')
+            else:
+                self.tokenCheck('-')
+            self.term()
+
+    def optional_sign(self):
+        if self.currentToken.token == '+':
+            self.tokenCheck('+')
+        elif self.currentToken.token == '-':
+            self.tokenCheck('-')
+        # else:
+        #     print(f"Syntax error: expected + or - received {self.currentToken.token}")
+
+    def term(self):
+        self.factor()
+        while self.currentToken.token in ['*', '//', '%']:
+            if self.currentToken.token == '*':
+                self.tokenCheck('*')
+            elif self.currentToken.token == '//':
+                self.tokenCheck('//')
+            else:
+                self.tokenCheck('%')
+            self.factor()
+
+    def factor(self):
+        if self.currentToken.tokenType in ['identifier', 'number']:
+            self.nextToken()
+            self.expression()
+        elif self.currentToken.token == '(':
+            self.tokenCheck('(')
+            self.expression()
+            self.tokenCheck(')')
+        else:
+            print(f"Syntax error: expected identifier, number, or ( received {self.currentToken.token}")
+            print(f"Line : {self.tokenIndex}")
+    
         # else:
         #     print(f"Syntax error: expected not, <, >, ==, !=, <=, >=, or identifier received {self.currentToken.token}")
         #     print(f"Line : {self.tokenIndex}")
@@ -526,7 +596,7 @@ class SyntaxAnalyzer:
 
     def term(self):
         self.factor()
-        while self.currentToken.token in ['*', '/', '%']:
+        while self.currentToken.token in ['*', '//', '%']:
             if self.currentToken.token == '*':
                 self.tokenCheck('*')
             elif self.currentToken.token == '//':
@@ -545,7 +615,7 @@ class SyntaxAnalyzer:
             self.tokenCheck(')')
         else:
             print(f"Syntax error: expected identifier, number, or ( received {self.currentToken.token}")
-            print(f"Line : {self.currentToken.token}")
+            print(f"Line : {self.tokenIndex}")
     
     def syntaxCorect(self):
         if self.currentToken.tokenType == 'EOF':
