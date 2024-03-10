@@ -524,7 +524,7 @@ class SyntaxAnalyzer:
             self.nextToken()
             self.condition()
         elif self.currentToken.tokenType == 'ArithmeticOperation': 
-            #self.nextToken()
+            self.nextToken()
             self.expression()
             self.condition()
         else:
