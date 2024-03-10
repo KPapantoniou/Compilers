@@ -318,18 +318,22 @@ class SyntaxAnalyzer:
         if self.currentToken.token == '#def':
                 self.tokenCheck('#def')
                 self.def_main()
+
         elif self.currentToken.token == '#int':
                 self.tokenCheck('#int')
                 self.declarations()
+                self.startRule()
         elif self.currentToken.token == 'def':
                 self.tokenCheck('def')
                 self.def_function()
+                self.startRule()
+        elif self.currentToken.token == 'EOF':
+                self.syntaxCorect()  
         else:
                 print(f"Syntax error: expected #def, #int, or def received {self.currentToken.token}")
                 print(f"Line : {self.tokenIndex}")
         
-        if self.currentToken.token == 'EOF':
-            self.syntaxCorect()   
+         
         
         #self.startRule()
 

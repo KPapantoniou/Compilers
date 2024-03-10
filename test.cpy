@@ -1,3 +1,6 @@
+
+#int counterFunctionCalls
+
 def max3(x,y,z):
 #{
     #int m
@@ -12,7 +15,6 @@ def max3(x,y,z):
     return m
 #}
 
-#int counterFunctionCalls
 
 
 
