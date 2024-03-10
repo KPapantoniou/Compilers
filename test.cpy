@@ -33,7 +33,6 @@ def isPrime(x):
 
 
 
-
 def max3(x,y,z):
 #{
     #int m
@@ -52,7 +51,7 @@ def max3(x,y,z):
 
 
 def fib(x):
-#{SsSssSS
+#{
     global counterFunctionCalls
     counterFunctionCalls = counterFunctionCalls + 1
     if x<0:
@@ -62,19 +61,6 @@ def fib(x):
     else:
         return fib(x-1) + fib(x-2)
 #}  
-
-
-
-
-
-
-
-
-
-
-
-     
-
 
      
 def quad(x):

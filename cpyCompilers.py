@@ -410,7 +410,7 @@ class SyntaxAnalyzer:
     def assignment_statements(self):
         if self.currentToken.tokenType == 'identifier':
             self.nextToken()
-        # self.tokenCheck('=')
+        self.tokenCheck('=')
         self.expression()
 
     def other_statements(self):
@@ -503,6 +503,7 @@ class SyntaxAnalyzer:
         elif self.currentToken.token in ['(',')']:
             #self.tokenCheck('(')
             self.nextToken()
+            
             self.condition()
             #self.tokenCheck(')')
         elif self.currentToken.tokenType == 'identifier':
@@ -515,6 +516,11 @@ class SyntaxAnalyzer:
             #self.nextToken()
             self.expression()
             self.condition()
+        while self.currentToken.token == ',':
+                self.tokenCheck(',')
+                if self.currentToken.tokenType == 'identifier':
+                    self.nextToken()
+                    self.condition()
         else:
             print(f"Syntax error: expected not, <, >, ==, !=, <=, >=, or identifier received {self.currentToken.token}")
             print(f"Line : {self.tokenIndex}")
@@ -522,7 +528,7 @@ class SyntaxAnalyzer:
     def expression(self):
         self.optional_sign()
         self.term()
-        while self.currentToken.token in ['+', '-']:
+        while self.currentToken.token in ['+', '-', '=']:
             if self.currentToken.token == '+':
                 self.tokenCheck('+')
             elif self.currentToken.token == '=':
@@ -559,6 +565,7 @@ class SyntaxAnalyzer:
             self.tokenCheck('(')
             self.expression()
             self.tokenCheck(')')
+        
         else:
             print(f"Syntax error: expected identifier, number, or ( received {self.currentToken.token}")
             print(f"Line : {self.tokenIndex}")
