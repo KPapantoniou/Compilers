@@ -422,6 +422,7 @@ class SyntaxAnalyzer:
 
     def if_statements(self):
         self.tokenCheck('if')
+        #while self.currentToken.token != ':':
         self.condition()
         self.tokenCheck(':')
         self.code_block()
@@ -491,12 +492,16 @@ class SyntaxAnalyzer:
         elif self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
             if self.currentToken.tokenType == 'CompareOperation':
                 self.nextToken()
+                self.condition()
         elif self.currentToken.tokenType == 'identifier':
             self.nextToken()
             self.condition()
-        else:
-            print(f"Syntax error: expected not, <, >, ==, !=, <=, >=, or identifier received {self.currentToken.token}")
-            print(f"Line : {self.tokenIndex}")
+        elif self.currentToken.tokenType == 'number':
+            self.nextToken()
+            self.condition()
+        # else:
+        #     print(f"Syntax error: expected not, <, >, ==, !=, <=, >=, or identifier received {self.currentToken.token}")
+        #     print(f"Line : {self.tokenIndex}")
 
     def expression(self):
         self.optional_sign()
