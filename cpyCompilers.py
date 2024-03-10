@@ -185,6 +185,7 @@ class LexicalAnalyzer:
                     token = currentCharacter+nextchar
                     state = self.STATES['stateOK']
                     finalWord += [token] + ['CompareOperation']
+                    index += 1
                 else:
                     token = currentCharacter
                     state = self.STATES['stateOK']
@@ -195,6 +196,7 @@ class LexicalAnalyzer:
                     token = currentCharacter+nextchar
                     state = self.STATES['stateOK']
                     finalWord += [token] + ['CompareOperation']
+                    index += 1
                 else:
                     token   = currentCharacter
                     state = self.STATES['stateOK']
@@ -202,19 +204,22 @@ class LexicalAnalyzer:
 
             if state == self.STATES['stateEqual']:
                 if nextchar == '=':
-                    token = currentCharacter+nextchar
+                    token = currentCharacter +nextchar
                     state = self.STATES['stateOK']
                     finalWord += [token] + ['CompareOperation']
+                    index += 1
                 else:
                     token = currentCharacter
                     state = self.STATES['stateOK']
-                    finalWord += [currentCharacter] + ['variable']        
+                    finalWord += [currentCharacter] + ['variable']    
+                      
         
             if state == self.STATES['stateDiffernt']:
                 if nextchar == '=':
                     token = currentCharacter+nextchar
                     state = self.STATES['stateOK']
                     finalWord += [token] + ['CompareOperation']
+                    index += 1
                 else:
                 
                     print("Error: Invalid character")
