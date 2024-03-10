@@ -361,6 +361,8 @@ class SyntaxAnalyzer:
             self.declarations()
         # self.declarations()
         self.code_block()
+        if self.currentToken.token == 'EOF':
+                self.syntaxCorect() 
 
     def def_function(self):
        
@@ -408,7 +410,7 @@ class SyntaxAnalyzer:
             self.tokenCheck('global')
             if self.currentToken.tokenType == 'identifier':
                     self.nextToken()
-        elif self.currentToken.token in ['if', 'while', 'print', 'return', 'input']:
+        elif self.currentToken.token in ['if', 'while', 'print', 'return', 'int']:
             self.other_statements()
         else:
             print(f"Syntax error: expected identifier, if, while, print, return, or input received {self.currentToken.token}")
@@ -429,7 +431,7 @@ class SyntaxAnalyzer:
             self.print_statements()
         elif self.currentToken.token == 'return':
             self.return_statements()
-        elif self.currentToken.token == 'input':
+        elif self.currentToken.token == 'int':
             self.input_statements()
 
     def if_statements(self):
@@ -484,7 +486,7 @@ class SyntaxAnalyzer:
 
     def code_block(self):
        
-        while self.currentToken.token in [ 'if', 'while', 'print', 'return', 'input','global'] or self.currentToken.tokenType == 'identifier':
+        while self.currentToken.token in [ 'if', 'while', 'print', 'return', 'input','global','int'] or self.currentToken.tokenType == 'identifier':
             self.statements()
 
     def condition(self):
