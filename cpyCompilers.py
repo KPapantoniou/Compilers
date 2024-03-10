@@ -589,18 +589,12 @@ class SyntaxAnalyzer:
 ##------------------------------------ Main ------------------------------------##
 lex = LexicalAnalyzer('./test.cpy')   
 tokens = lex.lexical_analyzer()
-#print(tokens)
 
-# for token in tokens:
-#     print(token.token, token.tokenType)
 
-tokensList = []
 for token in tokens:
-    # Append the token name (token) to the first column
-    tokensList.append([token.token, token.tokenType])
-print(tokensList)
+    print(token.token, token.tokenType)
+
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
 print("\n\n%d"%syntax.tokenIndex)
-#syntax.syntaxCorect()
-# print(tokensList)
+
