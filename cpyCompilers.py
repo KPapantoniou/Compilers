@@ -543,7 +543,7 @@ class SyntaxAnalyzer:
     def factor(self):
         if self.currentToken.tokenType in ['identifier', 'number']:
             self.nextToken
-            #self.expression()
+            self.expression()
         elif self.currentToken.token == '(':
             self.tokenCheck('(')
             self.expression()
