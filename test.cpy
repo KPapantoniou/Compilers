@@ -1,3 +1,7 @@
+
+#int counterFunctionCalls
+
+
 def fib(x):
 #{
     global counterFunctionCalls
@@ -7,10 +11,11 @@ def fib(x):
     elif x==0 or x==1:
         return 1
     else:
-        return fib(x-1)+fib(x-2)
-#}
+        return fib(x-1) + fib(x-2)
+#}  
 
-#int counterFunctionCalls
+
+
 
 def max3(x,y,z):
 #{
