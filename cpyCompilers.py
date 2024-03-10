@@ -365,16 +365,16 @@ class SyntaxAnalyzer:
         self.tokenCheck(':')
         self.tokenCheck('#{')
 
-        if self.currentToken.token == '#int':
-             self.tokenCheck('#int')
-             self.declarations()
+        while self.currentToken.token == '#int':
+            self.tokenCheck('#int')
+            self.declarations()
              
         if self.currentToken.token == 'global':
             self.tokenCheck('global')
             if self.currentToken.tokenType == 'identifier':
                     self.nextToken()
-        if self.currentToken.token == 'def':
-            self.tokenCheck('def')
+        while self.currentToken.token == 'def':
+            self.nextToken()
             self.def_function()
     
         self.code_block()
@@ -395,6 +395,8 @@ class SyntaxAnalyzer:
     def statements(self):
         if self.currentToken.tokenType == 'identifier':
             self.assignment_statements()
+        elif self.currentToken.token == '=':
+            self.assignment_statements()
         elif self.currentToken.token == 'global':
             self.tokenCheck('global')
             if self.currentToken.tokenType == 'identifier':
@@ -408,7 +410,7 @@ class SyntaxAnalyzer:
     def assignment_statements(self):
         if self.currentToken.tokenType == 'identifier':
             self.nextToken()
-        self.tokenCheck('=')
+        # self.tokenCheck('=')
         self.expression()
 
     def other_statements(self):
@@ -429,7 +431,7 @@ class SyntaxAnalyzer:
         self.condition()
         self.tokenCheck(':')
         self.code_block()
-        if self.currentToken.token == 'elif':
+        while self.currentToken.token == 'elif':
             self.elif_statements()
         if self.currentToken.token == 'else':
             self.else_statements()
@@ -461,6 +463,7 @@ class SyntaxAnalyzer:
         self.tokenCheck('print')
         self.tokenCheck('(')
         self.expression()
+        self.tokenCheck(')')
 
     def input_statements(self):
         self.tokenCheck('identifier')
@@ -473,6 +476,7 @@ class SyntaxAnalyzer:
         self.tokenCheck(')')
 
     def code_block(self):
+       
         while self.currentToken.token in [ 'if', 'while', 'print', 'return', 'input','global'] or self.currentToken.tokenType == 'identifier':
             self.statements()
 
@@ -521,6 +525,8 @@ class SyntaxAnalyzer:
         while self.currentToken.token in ['+', '-']:
             if self.currentToken.token == '+':
                 self.tokenCheck('+')
+            elif self.currentToken.token == '=':
+                self.tokenCheck('=')
             else:
                 self.tokenCheck('-')
             self.term()
