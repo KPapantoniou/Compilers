@@ -175,7 +175,7 @@ class LexicalAnalyzer:
                         token = '//'
                         index += 1
                         state = self.STATES['stateOK']
-                        finalWord += [token] + ['division']
+                        finalWord += [token] + ['ArithmeticOperation']
                 else:
                     
                     print("Error: Invalid character")
@@ -186,27 +186,27 @@ class LexicalAnalyzer:
                 if nextchar == '=':
                     token = currentCharacter+nextchar
                     state = self.STATES['stateOK']
-                    finalWord += [token] + ['less']
+                    finalWord += [token] + ['CompareOperation']
                 else:
                     token = currentCharacter
                     state = self.STATES['stateOK']
-                    finalWord += [currentCharacter] + ['less']
+                    finalWord += [currentCharacter] + ['CompareOperation']
 
             if state == self.STATES['stateMore']:
                 if nextchar == '=':
                     token = currentCharacter+nextchar
                     state = self.STATES['stateOK']
-                    finalWord += [token] + ['more']
+                    finalWord += [token] + ['CompareOperation']
                 else:
                     token   = currentCharacter
                     state = self.STATES['stateOK']
-                    finalWord += [currentCharacter] + ['more']
+                    finalWord += [currentCharacter] + ['CompareOperation']
 
             if state == self.STATES['stateEqual']:
                 if nextchar == '=':
                     token = currentCharacter+nextchar
                     state = self.STATES['stateOK']
-                    finalWord += [token] + ['equal']
+                    finalWord += [token] + ['CompareOperation']
                 else:
                     token = currentCharacter
                     state = self.STATES['stateOK']
@@ -216,7 +216,7 @@ class LexicalAnalyzer:
                 if nextchar == '=':
                     token = currentCharacter+nextchar
                     state = self.STATES['stateOK']
-                    finalWord += [token] + ['different']
+                    finalWord += [token] + ['CompareOperation']
                 else:
                 
                     print("Error: Invalid character")
@@ -489,11 +489,8 @@ class SyntaxAnalyzer:
             self.tokenCheck('not')
             self.condition()
         elif self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
-            
-            self.tokenCheck(self.currentToken.token)
-            
-            
-           
+            if self.currentToken.tokenType == 'CompareOperation':
+                self.nextToken()
         elif self.currentToken.tokenType == 'identifier':
             self.nextToken()
             self.condition()
@@ -516,8 +513,8 @@ class SyntaxAnalyzer:
             self.tokenCheck('+')
         elif self.currentToken.token == '-':
             self.tokenCheck('-')
-        else:
-            print(f"Syntax error: expected + or - received {self.currentToken.token}")
+        # else:
+        #     print(f"Syntax error: expected + or - received {self.currentToken.token}")
 
     def term(self):
         self.factor()
