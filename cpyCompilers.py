@@ -242,8 +242,9 @@ class LexicalAnalyzer:
                     index += 1
                     while index < len(fileContent) - 1 and not (fileContent[index] == '#' and fileContent[index + 1] == '#'):
                         index += 1
+                    
                     if index < len(fileContent) - 1:
-                        index += 2 
+                        index += 1
                     #finalWord += [token] + ['comment']
                     state = self.STATES['stateBegin']
                 
