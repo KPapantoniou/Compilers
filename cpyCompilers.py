@@ -395,6 +395,10 @@ class SyntaxAnalyzer:
     def statements(self):
         if self.currentToken.tokenType == 'identifier':
             self.assignment_statements()
+        elif self.currentToken.token == 'global':
+            self.tokenCheck('global')
+            if self.currentToken.tokenType == 'identifier':
+                    self.nextToken()
         elif self.currentToken.token in ['if', 'while', 'print', 'return', 'input']:
             self.other_statements()
         else:
@@ -469,29 +473,9 @@ class SyntaxAnalyzer:
         self.tokenCheck(')')
 
     def code_block(self):
-        while self.currentToken.token in [ 'if', 'while', 'print', 'return', 'input'] or self.currentToken.tokenType == 'identifier':
+        while self.currentToken.token in [ 'if', 'while', 'print', 'return', 'input','global'] or self.currentToken.tokenType == 'identifier':
             self.statements()
 
-    def condition(self):
-        self.bool_term()
-        while self.currentToken.token == 'or':
-            self.tokenCheck('or')
-            self.bool_term()
-
-    def bool_term(self):
-        self.bool_factor()
-        while self.currentToken.token == 'and':
-            self.tokenCheck('and')
-            self.bool_factor()
-
-    def bool_factor(self):
-        if self.currentToken.token == 'not':
-            self.tokenCheck('not')
-            self.condition()
-        elif self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
-            if self.currentToken.tokenType == 'CompareOperation':
-                self.nextToken()
-                self.condition()
     def condition(self):
         self.bool_term()
         while self.currentToken.token == 'or':
@@ -541,51 +525,7 @@ class SyntaxAnalyzer:
                 self.tokenCheck('-')
             self.term()
 
-    def optional_sign(self):
-        if self.currentToken.token == '+':
-            self.tokenCheck('+')
-        elif self.currentToken.token == '-':
-            self.tokenCheck('-')
-        # else:
-        #     print(f"Syntax error: expected + or - received {self.currentToken.token}")
-
-    def term(self):
-        self.factor()
-        while self.currentToken.token in ['*', '//', '%']:
-            if self.currentToken.token == '*':
-                self.tokenCheck('*')
-            elif self.currentToken.token == '//':
-                self.tokenCheck('//')
-            else:
-                self.tokenCheck('%')
-            self.factor()
-
-    def factor(self):
-        if self.currentToken.tokenType in ['identifier', 'number']:
-            self.nextToken()
-            self.expression()
-        elif self.currentToken.token == '(':
-            self.tokenCheck('(')
-            self.expression()
-            self.tokenCheck(')')
-        else:
-            print(f"Syntax error: expected identifier, number, or ( received {self.currentToken.token}")
-            print(f"Line : {self.tokenIndex}")
     
-        # else:
-        #     print(f"Syntax error: expected not, <, >, ==, !=, <=, >=, or identifier received {self.currentToken.token}")
-        #     print(f"Line : {self.tokenIndex}")
-
-    def expression(self):
-        self.optional_sign()
-        self.term()
-        while self.currentToken.token in ['+', '-']:
-            if self.currentToken.token == '+':
-                self.tokenCheck('+')
-            else:
-                self.tokenCheck('-')
-            self.term()
-
     def optional_sign(self):
         if self.currentToken.token == '+':
             self.tokenCheck('+')
