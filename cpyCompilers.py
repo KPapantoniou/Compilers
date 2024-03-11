@@ -589,12 +589,10 @@ class SyntaxAnalyzer:
 ##------------------------------------ Main ------------------------------------##
 lex = LexicalAnalyzer('./test.cpy')   
 tokens = lex.lexical_analyzer()
-
-
-for token in tokens:
-    print(token.token, token.tokenType)
+# for token in tokens:
+#     print(token.token, token.tokenType)
 
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
-print("\n\n%d"%syntax.tokenIndex)
+
 
