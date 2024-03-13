@@ -320,9 +320,10 @@ class SyntaxAnalyzer:
     def tokenCheck(self, expectedToken):
         if self.currentToken.token == expectedToken:
             self.nextToken()
+            return True
         else:
-            print(f"Syntax error: expected {expectedToken} received {self.currentToken.token}")
-            print(f"Line : {self.tokenIndex}")
+            raise Exception(f"Syntax error: expected '{expectedToken}' received '{self.currentToken.token}' token number '{self.tokenIndex}'")
+            
 
     def startRule(self):
         
@@ -336,13 +337,12 @@ class SyntaxAnalyzer:
                 self.startRule()
         elif self.currentToken.token == 'def':
                 self.tokenCheck('def')
-                self.def_function()
-                self.startRule()
+                if self.def_function():
+                    self.startRule()
         elif self.currentToken.token == 'EOF':
                 self.syntaxCorect()  
         else:
-                print(f"Syntax error: expected #def, #int, or def received {self.currentToken.token}")
-                print(f"Line : {self.tokenIndex}")
+                raise Exception(f"Syntax error: expected #def, #int, or def received '{self.currentToken.token}' token number '{self.tokenIndex}'")
         
          
         
@@ -352,7 +352,6 @@ class SyntaxAnalyzer:
 
     def def_main(self):
         self.tokenCheck('main')
-        # self.tokenCheck(':')
         
         while self.currentToken.token == 'def':
             self.def_function()
@@ -368,26 +367,36 @@ class SyntaxAnalyzer:
        
         if self.currentToken.tokenType == 'identifier':
             self.nextToken()
-        self.tokenCheck('(')
-        self.formal_pars()
-        self.tokenCheck(')')
-        self.tokenCheck(':')
-        self.tokenCheck('#{')
+            if self.tokenCheck('('):
+                self.formal_pars()
+                if self.tokenCheck(')'):
+                    if self.tokenCheck(':'):
+                        if self.tokenCheck('#{'):
+                            while self.currentToken.token == '#int':
+                                self.tokenCheck('#int')
+                                self.declarations()
+                                
+                            if self.currentToken.token == 'global':
+                                self.tokenCheck('global')
+                                if self.currentToken.tokenType == 'identifier':
+                                        self.nextToken()
+                            while self.currentToken.token == 'def':
+                                self.nextToken()
+                                self.def_function()
+                        
+                            self.code_block()
+                            if self.tokenCheck('#}'):
+                                return True
+        else:
+            print(f"Syntax error: expected #{{ received {self.currentToken.token}")
+            print(f"Line : {self.tokenIndex}")
+            raise Exception("Unexpected token received")
 
-        while self.currentToken.token == '#int':
-            self.tokenCheck('#int')
-            self.declarations()
-             
-        if self.currentToken.token == 'global':
-            self.tokenCheck('global')
-            if self.currentToken.tokenType == 'identifier':
-                    self.nextToken()
-        while self.currentToken.token == 'def':
-            self.nextToken()
-            self.def_function()
-    
-        self.code_block()
-        self.tokenCheck('#}')
+        
+
+        
+        
+           
 
     def declarations(self):
         if self.currentToken.tokenType == 'identifier':
@@ -436,7 +445,6 @@ class SyntaxAnalyzer:
 
     def if_statements(self):
         self.tokenCheck('if')
-        #while self.currentToken.token != ':':
         self.condition()
         self.tokenCheck(':')
         self.code_block()
