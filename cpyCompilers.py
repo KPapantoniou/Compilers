@@ -322,27 +322,29 @@ class SyntaxAnalyzer:
             self.nextToken()
             return True
         else:
-            raise Exception(f"Syntax error: expected '{expectedToken}' received '{self.currentToken.token}' token number '{self.tokenIndex}'")
+            raise Exception(f"Syntax error: expected '{expectedToken}' received '{self.currentToken.token}' token number '{self.tokenIndex+1}'")
             
 
     def startRule(self):
-        
+          
         if self.currentToken.token == '#def':
-                self.tokenCheck('#def')
-                self.def_main()
+            self.tokenCheck('#def')
+            self.def_main()
+            # self.nextToken()  
+            if self.currentToken.token == 'EOF':
+                self.syntaxCorect()
 
         elif self.currentToken.token == '#int':
-                self.tokenCheck('#int')
-                self.declarations()
-                self.startRule()
+            self.tokenCheck('#int')
+            self.declarations()
+            self.startRule()
         elif self.currentToken.token == 'def':
-                self.tokenCheck('def')
-                if self.def_function():
-                    self.startRule()
-        elif self.currentToken.token == 'EOF':
-                self.syntaxCorect()  
+            self.tokenCheck('def')
+            if self.def_function():
+                self.startRule()
+
         else:
-                raise Exception(f"Syntax error: expected #def, #int, or def received '{self.currentToken.token}' token number '{self.tokenIndex}'")
+            raise Exception(f"Syntax error: expected #def, #int, or def received '{self.currentToken.token}' token number '{self.tokenIndex}'")
         
          
         
@@ -375,7 +377,6 @@ class SyntaxAnalyzer:
                             while self.currentToken.token == '#int':
                                 self.tokenCheck('#int')
                                 self.declarations()
-                                
                             if self.currentToken.token == 'global':
                                 self.tokenCheck('global')
                                 if self.currentToken.tokenType == 'identifier':
@@ -391,12 +392,6 @@ class SyntaxAnalyzer:
             print(f"Syntax error: expected #{{ received {self.currentToken.token}")
             print(f"Line : {self.tokenIndex}")
             raise Exception("Unexpected token received")
-
-        
-
-        
-        
-           
 
     def declarations(self):
         if self.currentToken.tokenType == 'identifier':
@@ -492,23 +487,26 @@ class SyntaxAnalyzer:
         self.expression()
 
     def print_statements(self):
+        print("Entering print statment!\n")
         self.tokenCheck('print')
         self.tokenCheck('(')
         self.expression()
         self.tokenCheck(')')
 
     def input_statements(self):
-        self.tokenCheck('identifier')
-        self.tokenCheck('=')
+        # print("input statment!\n")
+        # self.tokenCheck('identifier')
+        # self.tokenCheck('=')
         self.tokenCheck('int')
+        
         self.tokenCheck('(')
+       
         self.tokenCheck('input')
         self.tokenCheck('(')
         self.tokenCheck(')')
         self.tokenCheck(')')
 
     def code_block(self):
-       
         while self.currentToken.token in [ 'if', 'while', 'print', 'return', 'input','global','int'] or self.currentToken.tokenType == 'identifier':
             self.statements()
 
@@ -554,25 +552,34 @@ class SyntaxAnalyzer:
         #     print(f"Line : {self.tokenIndex}")
 
     def expression(self):
-        # self.optional_sign()
-        self.term()
-        while self.currentToken.token in ['+', '-', '=']:
-            if self.currentToken.token == '+':
-                self.tokenCheck('+')
-            elif self.currentToken.token == '=':
-                self.tokenCheck('=')
-            else:
-                self.tokenCheck('-')
+        if self.currentToken.token in ['if','elif','else','while','print','return','input','int']:
+            self.statements()
+            if self.currentToken.token != '#}' and self.currentToken.token not in ['+', '-', '=']:
+                self.expression()
+        elif self.currentToken.token =='#}':
+            self.tokenCheck('#}')
+        else:
+            self.optional_sign()
             self.term()
+            while self.currentToken.token in ['+', '-', '=']:
+                if self.currentToken.token == '+':
+                    self.tokenCheck('+')
+                elif self.currentToken.token == '=':
+                    self.tokenCheck('=')
+                else:
+                    self.tokenCheck('-')
+                self.term()
+                if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}':  # Add a condition to avoid infinite recursion
+                    self.expression()
 
     
-    # def optional_sign(self):
-    #     if self.currentToken.token == '+':
-    #         self.tokenCheck('+')
-    #     elif self.currentToken.token == '-':
-    #         self.tokenCheck('-')
-        # else:
-        #     print(f"Syntax error: expected + or - received {self.currentToken.token}")
+    def optional_sign(self):
+        if self.currentToken.token == '+':
+            self.tokenCheck('+')
+        elif self.currentToken.token == '-':
+            self.tokenCheck('-')
+        #else:
+            #print(f"Syntax error: expected + or - received {self.currentToken.token}")
 
     def term(self):
         self.factor()
@@ -586,9 +593,9 @@ class SyntaxAnalyzer:
             self.factor()
 
     def factor(self):
-        if self.currentToken.tokenType in ['identifier', 'number']:
+        if self.currentToken.tokenType in ['identifier', 'number','keyword']:#keyword 
             self.nextToken() 
-        elif self.currentToken.token == '(':
+        if self.currentToken.token == '(':
             self.tokenCheck('(')
             self.expression()
             self.tokenCheck(')')
@@ -612,5 +619,5 @@ tokens = lex.lexical_analyzer()
 
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
-
-
+syntax.syntaxCorect()
+print(f'Syntax is correct!,{syntax.currentToken.token},{syntax.tokenIndex+1} \n\n')

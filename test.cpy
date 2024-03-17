@@ -1,9 +1,19 @@
-       
-
-
+  
 ##THIS IS A TEST TO CHECK IF WE SKIP THE COMENTS
 EVEN IN DIFFERENT LINES
 UNTIL WE SEE THIS -> ##
+
+def fib(x):
+#{
+    global counterFunctionCalls
+    counterFunctionCalls = counterFunctionCalls + 1
+    if x<0:
+        return -1
+    elif x==0 or x==1:
+        return 1
+    else:
+        return fib(x-1) + fib(x-2)
+#}  
     
 def isPrime(x):
 #{
@@ -53,17 +63,7 @@ def max3(x,y,z):
 #int counterFunctionCalls
 
 
-def fib(x):
-#{
-    global counterFunctionCalls
-    counterFunctionCalls = counterFunctionCalls + 1
-    if x<0:
-        return -1
-    elif x==0 or x==1:
-        return 1
-    else:
-        return fib(x-1) + fib(x-2)
-#}  
+
 
      
 def quad(x):
