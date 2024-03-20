@@ -1,4 +1,4 @@
-  
+
 ##THIS IS A TEST TO CHECK IF WE SKIP THE COMENTS
 EVEN IN DIFFERENT LINES
 UNTIL WE SEE THIS -> ##
@@ -98,7 +98,6 @@ def leap(year):
         return 0 
 #}        
 
-
 #def main
 #int i
 counterFunctionCalls = 0
@@ -125,4 +124,8 @@ while i<=12:
     i = i + 1
 #}
 
-print(counterFunctionCalls) 
+print(counterFunctionCalls)   
+
+
+
+
