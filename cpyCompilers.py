@@ -1,5 +1,5 @@
 #Authors: 1. Konstantinos Papantoniou-Xatzigiosis, AM: 4769
-#         2. Natalia                             , AM: 
+#         2. Natalia Michou                      , AM: 4922
 # Date: 2024-03-25
 # Description: A lexical and syntax analyzer for the cpy language.
 # The lexical analyzer reads a file and generates tokens.
@@ -611,7 +611,7 @@ class SyntaxAnalyzer:
 
   
 ##------------------------------------ Main ------------------------------------##
-lex = LexicalAnalyzer('./test.cpy')   
+lex = LexicalAnalyzer('./test2.cpy')   
 tokens = lex.lexical_analyzer()
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
