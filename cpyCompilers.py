@@ -44,7 +44,7 @@ class LexicalAnalyzer:
 
     def lexical_analyzer(self):
         file = open(self.filename, 'r')
-        compilationFile = open('compilationFile.txt', 'w')
+        compilationFile = open('lexicalAnalyzer.txt', 'w')
         compilationFile.write("lexigram analysis of the file: %s \n" %file.name)
         fileContent = file.read()
         alpha = False
@@ -318,6 +318,9 @@ class LexicalAnalyzer:
 
 ##------------------------------------ Syntax Analyzer ------------------------------------##
 class SyntaxAnalyzer:
+    syntaxFile = open('SyntaxAnalyzer.txt', 'w')
+    syntaxFile.write("Syntax analysis of the file: %s \n" %fileName)
+    
     def __init__(self, tokens):
         self.tokens = tokens
         self.tokenIndex = 0
@@ -329,7 +332,7 @@ class SyntaxAnalyzer:
 
 
     def nextToken(self):
-        print(self.currentToken.token+'|\t\t\t\t|'+str(self.tokenIndex))
+       
         if self.tokenIndex < len(self.tokens):
             self.tokenIndex += 1
             self.currentToken = self.tokens[self.tokenIndex]
@@ -338,6 +341,7 @@ class SyntaxAnalyzer:
         
 
     def tokenCheck(self, expectedToken):
+        self.syntaxFile.write(f"Token Checking: {expectedToken}\t Token index: {self.tokenIndex}\n")
         if self.currentToken.token == expectedToken:
             self.nextToken()
             return True
@@ -574,7 +578,7 @@ class SyntaxAnalyzer:
                 else:
                     self.tokenCheck('-')
                 self.term()
-                if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}':  # Add a condition to avoid infinite recursion
+                if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}': 
                     self.expression()
 
     
@@ -610,6 +614,7 @@ class SyntaxAnalyzer:
     
     def syntaxCorect(self):
         if self.currentToken.tokenType == 'EOF':
+            self.syntaxFile.write("\n\nEnding Token: "+self.currentToken.token+"Index of Ending Token: "+str(self.tokenIndex))
             print("\n\nEnding Token: "+self.currentToken.token)            
             print('Syntax is correct\n\n')
 

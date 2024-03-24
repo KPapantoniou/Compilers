@@ -1,3 +1,7 @@
+##Authors: 1. Konstantinos Papantoniou-Xatzigiosis, AM: 4769
+#         2. Natalia Michou                      , AM: 4922
+# Date: 2024-03-25##
+
 ##checking different testcases of the cpy language##
 
 def factorial(n):
@@ -33,14 +37,14 @@ def isOdd(n):
 #int j
 
 i = int(input())
-
+j=0
 print(factorial(i))
 while i > 0:
    
     i = i - 1
     
-while j > 0:#{
-    
+while j > 0:
+#{ 
     j = j - 1
 #}
 if isEven(i):
@@ -49,4 +53,5 @@ if isEven(i):
 elif isOdd(i):
     print(isOdd(i))
 else:
-    print(0)    
+    print(0)
+    

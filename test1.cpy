@@ -1,3 +1,7 @@
+##Authors: 1. Konstantinos Papantoniou-Xatzigiosis, AM: 4769
+#         2. Natalia Michou                      , AM: 4922
+# Date: 2024-03-25##
+
 ##Test to check arithmetic operations##
 
 #int a
@@ -79,4 +83,5 @@ print(multiply(x))
 print(divide(x))
 print(modOp(x))
 print(power(x))
-print(gcdre) 
+print(gcdre)
+
