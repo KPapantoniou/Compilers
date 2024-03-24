@@ -5,9 +5,10 @@
 # The lexical analyzer reads a file and generates tokens.
 # The syntax analyzer checks the syntax of the cpy language.
 
-import string
-import sys
 
+from sys import argv
+
+fileName = argv[1] 
 global cpyFile
 
 class Token:
@@ -80,8 +81,10 @@ class LexicalAnalyzer:
         while(index<len(fileContent)and state not in[self.STATES['stateOK'],self.STATES['stateERROR']]):
             currentCharacter = fileContent[index]
         
-            if index < len(fileContent)-2:
+            if index < len(fileContent)-1:
                 nextchar = fileContent[index+1]
+            elif not fileContent:
+                state = self.STATES['stateEOF']
             else:
                 state = self.STATES['stateEOF']
             if(currentCharacter=='\n'):
@@ -552,12 +555,14 @@ class SyntaxAnalyzer:
             self.condition()
 
     def expression(self):
+        
         if self.currentToken.token in ['if','elif','else','while','print','return','input']:
             self.statements()
             if self.currentToken.token != '#}' and self.currentToken.token not in ['+', '-', '=']:
                 self.expression()
         elif self.currentToken.token =='#}':
             self.tokenCheck('#}')
+        
         else:
             self.optional_sign()
             self.term()
@@ -611,7 +616,8 @@ class SyntaxAnalyzer:
 
   
 ##------------------------------------ Main ------------------------------------##
-lex = LexicalAnalyzer('./test2.cpy')   
+
+lex = LexicalAnalyzer(fileName)   
 tokens = lex.lexical_analyzer()
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()

@@ -8,21 +8,7 @@ def factorial(n):
         return n * factorial(n-1)
     #}
     
-def gcd(a, b):
-    #{
-    if b == 0:
-        return a
-    else:
-        return gcd(b, a % b)
-    #}
-    
-def power(x, y):
-    #{
-    if y == 0:
-        return 1
-    else:
-        return x * power(x, y-1)
-    #}
+
     
 def isEven(n):
     #{
@@ -47,10 +33,8 @@ def isOdd(n):
 #int j
 
 i = int(input())
-j = int(input())
+
 print(factorial(i))
-print(gcd(200, 321))
-print(power(i, j))
 while i > 0:
    
     i = i - 1
@@ -65,4 +49,4 @@ if isEven(i):
 elif isOdd(i):
     print(isOdd(i))
 else:
-    print(0)
+    print(0)    
