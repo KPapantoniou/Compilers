@@ -9,14 +9,16 @@
 from sys import argv
 
 fileName = argv[1] 
-global cpyFile
 
+quadrupleList = []
+lineCount =0
+tempVariableCount =0 
 class Token:
     def __init__(self, token, tokenType):
         self.token = token 
         self.tokenType = tokenType
 
-##------------------------------------ Lexical Analyzer ------------------------------------##
+##-------------------------------------------- Lexical Analyzer --------------------------------------------##
 class LexicalAnalyzer:
 
     def __init__(self, filename):
@@ -619,8 +621,61 @@ class SyntaxAnalyzer:
             print('Syntax is correct\n\n')
 
 
+##------------------------------------ Intermediate Code -------------------------------##
   
-##------------------------------------ Main ------------------------------------##
+class Quadruple:
+
+    def __init__(self,operation,x,y,z):
+        # self.lineId = int(lineId)
+        self.operation = str(operation)
+        self.x = str(x)
+        self.y = str(y)
+        self.z = str(z)
+
+    def functionFormt(self):
+        
+        
+        
+        print(lineCount,":" + self.operation +","+ self.x + "," + self.y + "," + self.z)
+        
+        return lineCount,":" + self.operation +","+ self.x + "," + self.y + "," + self.z
+
+    def nextquad():
+
+        global lineCount
+        return lineCount + 1
+
+
+    def genquad(self,operation,x,y,z):
+        global quadrupleList,lineCount
+        # newLine = self.nextquad()
+        newQuad = Quadruple(operation,x,y,z)
+        quadrupleList.append(newQuad)
+
+    def emptylist():
+        newList = []
+        return newList
+    
+    def mergelist(list1,list2):
+        merged = list1 + list2
+        return merged
+
+    def newtemp():
+        global tempVariableCount
+        tempVariableCount += 1
+        return f"T_{tempVariableCount}"
+
+    def makelist(x):
+        newList = []
+        newList.append(x)
+        return newList
+
+    def backpatch(list,z):
+        for quadruple in quadrupleList:
+            if quadruple in list:
+                quadruple[-1] = str(z)
+
+##-------------------------------------------- Main --------------------------------------------##
 
 lex = LexicalAnalyzer(fileName)   
 tokens = lex.lexical_analyzer()
