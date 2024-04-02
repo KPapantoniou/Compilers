@@ -1,4 +1,4 @@
-Syntax analysis of the file: test.cpy 
+Syntax analysis of the file: ./test.cpy 
 Token Checking: def	 Token index: 0
 Token Checking: (	 Token index: 2
 Token Checking: )	 Token index: 4

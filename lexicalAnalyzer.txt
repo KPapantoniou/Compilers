@@ -1,4 +1,4 @@
-lexigram analysis of the file: test.cpy 
+lexigram analysis of the file: ./test.cpy 
 ---------------------------------------------------------
 { def -> keyword }
 Token number: 1

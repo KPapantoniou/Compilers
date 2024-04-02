@@ -6,10 +6,11 @@
 # The syntax analyzer checks the syntax of the cpy language.
 
 
-from sys import argv
+# from sys import argv
 
-fileName = argv[1] 
-
+# fileName = argv[1] 
+fileName = './test.cpy'
+temporaryVariables = []
 quadrupleList = []
 lineCount =0
 tempVariableCount =0 
@@ -439,10 +440,14 @@ class SyntaxAnalyzer:
 
     def assignment_statements(self):
         if self.currentToken.tokenType == 'identifier':
+            result = self.currentToken.token
             self.nextToken()
+       
         self.tokenCheck('=')
         self.other_statements()
-        self.expression()
+        expression = self.expression()
+        Quadruple.genquad('=',expression, '', result)
+        Quadruple.functionFormat('=',expression, '', result)
 
     def other_statements(self):
         if self.currentToken.token == 'if':
@@ -582,7 +587,7 @@ class SyntaxAnalyzer:
                 self.term()
                 if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}': 
                     self.expression()
-
+        return self.currentToken.token
     
     def optional_sign(self):
         if self.currentToken.token == '+':
@@ -600,6 +605,7 @@ class SyntaxAnalyzer:
             else:
                 self.tokenCheck('%')
             self.factor()
+        return self.currentToken.token
 
     def factor(self):
         if self.currentToken.tokenType in ['identifier', 'number', 'keyword']:
@@ -608,11 +614,14 @@ class SyntaxAnalyzer:
                 self.tokenCheck('(')
                 self.expression()
                 self.tokenCheck(')')
+            
         elif self.currentToken.token == '(':
             self.tokenCheck('(')
             self.expression()
             self.tokenCheck(')')
             self.bool_factor()
+        print(self.currentToken.token)
+        return self.currentToken.token
     
     def syntaxCorect(self):
         if self.currentToken.tokenType == 'EOF':
@@ -625,31 +634,31 @@ class SyntaxAnalyzer:
   
 class Quadruple:
 
-    def __init__(self,operation,x,y,z):
-        # self.lineId = int(lineId)
+    def __init__(self, operation, x, y, z):
         self.operation = str(operation)
         self.x = str(x)
         self.y = str(y)
         self.z = str(z)
+        
 
-    def functionFormt(self):
+    def functionFormat(operation, x, y, z):
         
+        print(lineCount,":" + operation +","+ x + "," + y + "," + z)
         
-        
-        print(lineCount,":" + self.operation +","+ self.x + "," + self.y + "," + self.z)
-        
-        return lineCount,":" + self.operation +","+ self.x + "," + self.y + "," + self.z
-
-    def nextquad():
+        # return lineCount,":" + operation +","+ x + "," + self.y + "," + self.z
+    @classmethod
+    def nextquad(cls):
 
         global lineCount
-        return lineCount + 1
+        lineCount += 1
+        return 
 
 
-    def genquad(self,operation,x,y,z):
-        global quadrupleList,lineCount
-        # newLine = self.nextquad()
-        newQuad = Quadruple(operation,x,y,z)
+    def genquad(operation, x, y, z):
+        global quadrupleList, lineCount
+                
+        newQuad = Quadruple(operation, x, y, z)
+        newQuad.nextquad()
         quadrupleList.append(newQuad)
 
     def emptylist():
@@ -661,8 +670,9 @@ class Quadruple:
         return merged
 
     def newtemp():
-        global tempVariableCount
+        global tempVariableCount,temporaryVariables
         tempVariableCount += 1
+        temporaryVariables.append(f"T_{tempVariableCount}")
         return f"T_{tempVariableCount}"
 
     def makelist(x):
@@ -681,4 +691,11 @@ lex = LexicalAnalyzer(fileName)
 tokens = lex.lexical_analyzer()
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
+quad = Quadruple.genquad('+','x','y','z')
+
+# temp = quad.newtemp()
+# for quad in quadrupleList:
+#     quad.functionFormat()
+
+
 
