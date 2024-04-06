@@ -694,7 +694,8 @@ class SyntaxAnalyzer:
             # print(tail)
             if(tail):
                 Quadruple.genquad('call',res,'_', '_')
-                Quadruple.functionFormat('call',res,'_', '_')        
+                Quadruple.functionFormat('call',res,'_', '_')  
+                res = tail      
         return res
     
     def idtail(self):
