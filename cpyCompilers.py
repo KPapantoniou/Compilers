@@ -543,11 +543,11 @@ class SyntaxAnalyzer:
         return self.currentToken.token
     
     def bool_term(self):
-        self.bool_factor()
+        res =self.bool_factor()
         while self.currentToken.token == 'and':
             self.tokenCheck('and')
-            self.bool_factor()
-        return self.currentToken.token
+            res=  self.bool_factor()
+        return res
 
     # def bool_factor(self):
     #     if self.currentToken.token == 'not':
@@ -612,7 +612,7 @@ class SyntaxAnalyzer:
             res = self.term()
             first_place = sign + res
             
-            while self.currentToken.token in ['+', '-', '=']:
+            while self.currentToken.token in ['+','-', '=']:
                 if self.currentToken.token == '+':
                     operator = self.currentToken.token
                     self.tokenCheck('+')
@@ -624,6 +624,7 @@ class SyntaxAnalyzer:
                     self.tokenCheck('-')
                 
                 second_place = self.term()
+                # print(second_place)
                 z = Quadruple.newtemp()
                 Quadruple.genquad(operator, first_place, second_place,z)
                 Quadruple.functionFormat(operator, first_place, second_place,z)
@@ -644,6 +645,7 @@ class SyntaxAnalyzer:
         elif self.currentToken.token == '-':
             sign = self.currentToken.token
             self.tokenCheck('-')
+        
         return sign
 
     def term(self):
@@ -680,6 +682,7 @@ class SyntaxAnalyzer:
         if self.currentToken.tokenType in [ 'number', 'keyword']:
             res = self.currentToken.token
             self.nextToken()
+            self.factor()
         elif self.currentToken.token == '(':
             res = self.currentToken.token
             self.tokenCheck('(')
@@ -688,7 +691,10 @@ class SyntaxAnalyzer:
         elif self.currentToken.tokenType == 'identifier':
             res = self.currentToken.token
             self.nextToken()
-            self.idtail()
+            tail = self.idtail()
+            if(tail):
+                Quadruple.genquad('call',res,'_', '_')
+                Quadruple.functionFormat('call',res,'_', '_')        
         return res
     
     def idtail(self):
