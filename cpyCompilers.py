@@ -447,7 +447,8 @@ class SyntaxAnalyzer:
         
         self.other_statements()
         expression = self.expression()
-        # print(expression,result)
+        # print(expression)
+        print(expression,'\t',result)
         Quadruple.genquad('=',expression,'_',result)
         Quadruple.functionFormat('=',expression,'_',result)
 
@@ -600,39 +601,39 @@ class SyntaxAnalyzer:
 
     def expression(self):
         new_temp = ''
-        if self.currentToken.token in ['if','elif','else','while','print','return','input']:
-            self.statements()
-            if self.currentToken.token != '#}' and self.currentToken.token not in ['+', '-', '=']:
-                self.expression()
-        elif self.currentToken.token =='#}':
-            self.tokenCheck('#}')
+        # if self.currentToken.token in ['if','elif','else','while','print','return','input']:
+        #     self.statements()
+        #     if self.currentToken.token != '#}' and self.currentToken.token not in ['+', '-', '=']:
+        #         self.expression()
+        # elif self.currentToken.token =='#}':
+        #     self.tokenCheck('#}')
         
-        else:
-            sign =self.optional_sign()
-            res = self.term()
-            first_place = sign + res
+       
+        sign =self.optional_sign()
+        res = self.term()
+        first_place = sign + res
+        
+        while self.currentToken.token in ['+','-', '=']:
+            if self.currentToken.token == '+':
+                operator = self.currentToken.token
+                self.tokenCheck('+')
+            elif self.currentToken.token == '=':
+                operator = self.currentToken.token
+                self.tokenCheck('=')
+            else:
+                operator = self.currentToken.token
+                self.tokenCheck('-')
             
-            while self.currentToken.token in ['+','-', '=']:
-                if self.currentToken.token == '+':
-                    operator = self.currentToken.token
-                    self.tokenCheck('+')
-                elif self.currentToken.token == '=':
-                    operator = self.currentToken.token
-                    self.tokenCheck('=')
-                else:
-                    operator = self.currentToken.token
-                    self.tokenCheck('-')
-                
-                second_place = self.term()
-                # print(second_place)
-                z = Quadruple.newtemp()
-                Quadruple.genquad(operator, first_place, second_place,z)
-                Quadruple.functionFormat(operator, first_place, second_place,z)
-                new_temp = z
-                # print(operator, firs_place, second_place,z)
-                
-                # if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}': 
-                #     self.expression()
+            second_place = self.term()
+            # print(second_place)
+            z = Quadruple.newtemp()
+            Quadruple.genquad(operator, first_place, second_place,z)
+            Quadruple.functionFormat(operator, first_place, second_place,z)
+            new_temp = z
+            # print(operator, firs_place, second_place,z)
+            
+            # if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}': 
+            #     self.expression()
         return  new_temp
     
     
@@ -682,12 +683,12 @@ class SyntaxAnalyzer:
         if self.currentToken.tokenType in [ 'number', 'keyword']:
             res = self.currentToken.token
             self.nextToken()
-        elif self.currentToken.token == '(':
+        if self.currentToken.token == '(':
             res = self.currentToken.token
             self.tokenCheck('(')
             self.expression()
             self.tokenCheck(')')
-        elif self.currentToken.tokenType == 'identifier':
+        if self.currentToken.tokenType == 'identifier':
             res = self.currentToken.token
             self.nextToken()
             tail = self.idtail()
