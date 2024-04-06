@@ -733,7 +733,7 @@ class Quadruple:
 
     def functionFormat(operation, x, y, z):
         
-        print(lineCount,":" + operation +","+ x + "," + y + "," + z)
+        print(lineCount,":" + operation +","+ x + "," + y + "," + z,'\n')
         
         # return lineCount,":" + operation +","+ x + "," + self.y + "," + self.z
     @classmethod
