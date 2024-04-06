@@ -447,9 +447,9 @@ class SyntaxAnalyzer:
         
         self.other_statements()
         expression = self.expression()
-        Quadruple.genquad('=',expression, '', result)
-        Quadruple.functionFormat('=',expression, '', result)
-        print("Here!")
+        # print(expression,result)
+        Quadruple.genquad('=',expression,'_',result)
+        Quadruple.functionFormat('=',expression,'_',result)
 
     def other_statements(self):
         if self.currentToken.token == 'if':
@@ -540,12 +540,14 @@ class SyntaxAnalyzer:
         while self.currentToken.token == 'or':
             self.tokenCheck('or')
             self.bool_term()
-
+        return self.currentToken.token
+    
     def bool_term(self):
         self.bool_factor()
         while self.currentToken.token == 'and':
             self.tokenCheck('and')
             self.bool_factor()
+        return self.currentToken.token
 
     # def bool_factor(self):
     #     if self.currentToken.token == 'not':
@@ -589,13 +591,15 @@ class SyntaxAnalyzer:
             if self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
                 self.nextToken()
                 self.expression()
+        
             
             # elif self.currentToken.tokenType in ['identifier', 'number']:
             #     self.expression()
+        return self.currentToken.token
 
 
     def expression(self):
-        
+        new_temp = ''
         if self.currentToken.token in ['if','elif','else','while','print','return','input']:
             self.statements()
             if self.currentToken.token != '#}' and self.currentToken.token not in ['+', '-', '=']:
@@ -604,40 +608,46 @@ class SyntaxAnalyzer:
             self.tokenCheck('#}')
         
         else:
-            self.optional_sign()
-            self.term()
+            sign =self.optional_sign()
+            res = self.term()
+            first_place = sign + res
+            
             while self.currentToken.token in ['+', '-', '=']:
                 if self.currentToken.token == '+':
+                    operator = self.currentToken.token
                     self.tokenCheck('+')
                 elif self.currentToken.token == '=':
+                    operator = self.currentToken.token
                     self.tokenCheck('=')
                 else:
+                    operator = self.currentToken.token
                     self.tokenCheck('-')
-                self.term()
+                
+                second_place = self.term()
+                z = Quadruple.newtemp()
+                Quadruple.genquad(operator, first_place, second_place,z)
+                Quadruple.functionFormat(operator, first_place, second_place,z)
+                new_temp = z
+                # print(operator, firs_place, second_place,z)
+                
                 # if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}': 
                 #     self.expression()
-        return self.currentToken.token
+        return  new_temp
     
-    # def expression(self):
-    #     global token
-    #     # optional sign term
-    #     if token.recognized_string=='+' or token.recognized_string=='-':
-    #         token = self.get_token()
-            
-    #     #print('from expression:' +str(token))
-    #     self.term()
-    #     while token.recognized_string=='+' or token.recognized_string=='-' or token.recognized_string=='%':
-    #         token = self.get_token()
-    #         self.term()
+    
     
     def optional_sign(self):
+        sign = ''
         if self.currentToken.token == '+':
+            sign = self.currentToken.token
             self.tokenCheck('+')
         elif self.currentToken.token == '-':
+            sign = self.currentToken.token
             self.tokenCheck('-')
+        return sign
 
     def term(self):
-        self.factor()
+        res = self.factor()
         while self.currentToken.token in ['*', '//', '%']:
             if self.currentToken.token == '*':
                 self.tokenCheck('*')
@@ -645,8 +655,8 @@ class SyntaxAnalyzer:
                 self.tokenCheck('//')
             else:
                 self.tokenCheck('%')
-            self.factor()
-        return self.currentToken.token
+            res = self.factor()
+        return res
 
     # def factor(self):
     #     if self.currentToken.tokenType in ['identifier', 'number', 'keyword']:
@@ -666,28 +676,34 @@ class SyntaxAnalyzer:
         # return self.currentToken.token
     
     def factor(self):
+        res = ''
         if self.currentToken.tokenType in [ 'number', 'keyword']:
+            res = self.currentToken.token
             self.nextToken()
         elif self.currentToken.token == '(':
+            res = self.currentToken.token
             self.tokenCheck('(')
             self.expression()
             self.tokenCheck(')')
         elif self.currentToken.tokenType == 'identifier':
+            res = self.currentToken.token
             self.nextToken()
             self.idtail()
-        return self.currentToken.token
+        return res
     
     def idtail(self):
         if self.currentToken.token == '(':
             self.tokenCheck('(')
             self.actual_pars()
             self.tokenCheck(')')
+        return  self.currentToken.token
     
     def actual_pars(self):
         self.expression()
         while self.currentToken.token == ',':
             self.tokenCheck(',')
             self.expression()
+        return self.currentToken.token
 
     def syntaxCorect(self):
         if self.currentToken.tokenType == 'EOF':
