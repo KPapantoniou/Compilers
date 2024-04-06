@@ -429,7 +429,7 @@ class SyntaxAnalyzer:
     def statements(self):
         if self.currentToken.tokenType == 'identifier':
             self.assignment_statements()
-        elif self.currentToken.token == '=':
+        elif self.currentToken.token == '=': ## this here
             self.assignment_statements()
         elif self.currentToken.token == 'global':
             self.tokenCheck('global')
@@ -444,10 +444,12 @@ class SyntaxAnalyzer:
             self.nextToken()
        
         self.tokenCheck('=')
+        
         self.other_statements()
         expression = self.expression()
         Quadruple.genquad('=',expression, '', result)
         Quadruple.functionFormat('=',expression, '', result)
+        print("Here!")
 
     def other_statements(self):
         if self.currentToken.token == 'if':
@@ -526,6 +528,12 @@ class SyntaxAnalyzer:
     def code_block(self):
         while self.currentToken.token in [ 'if', 'while', 'print', 'return', 'input','global','int'] or self.currentToken.tokenType == 'identifier':
             self.statements()
+    # def code_block(self):
+    #     while self.currentToken.token != '#}':
+    #         self.statements()
+    #         # if self.currentToken.token != '#}':
+    #         #     self.code_block()
+    #         self.nextToken()
 
     def condition(self):
         self.bool_term()
@@ -539,31 +547,52 @@ class SyntaxAnalyzer:
             self.tokenCheck('and')
             self.bool_factor()
 
+    # def bool_factor(self):
+    #     if self.currentToken.token == 'not':
+    #         self.tokenCheck('not')
+    #         self.condition()
+    #     elif self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
+    #         if self.currentToken.tokenType == 'CompareOperation':
+    #             self.nextToken() 
+    #             self.expression() 
+    #             # self.factor()
+    #     elif self.currentToken.token in ['(',')']:
+    #         if self.currentToken.token == '(':
+    #             self.tokenCheck('(')
+    #             self.condition()
+            
+    #         elif self.currentToken.token == ')':
+    #             self.tokenCheck(')')
+    #             # self.condition()
+    #     else:    
+    #         self.expression()
+    #         if self.currentToken.tokenType == 'ArithmeticOperation': 
+    #             self.expression()
+    #             # self.condition()
+    #         # elif self.currentToken.tokenType in ['identifier', 'number']:
+    #         #     self.nextToken() 
+    #         #     self.condition()
+            
+    #         # elif self.currentToken.token == ',':
+    #         #     self.nextToken()
+    #         #     self.condition()
     def bool_factor(self):
         if self.currentToken.token == 'not':
             self.tokenCheck('not')
             self.condition()
-        elif self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
-            if self.currentToken.tokenType == 'CompareOperation':
-                self.nextToken()  
-                self.factor()
-        elif self.currentToken.token in ['(',')']:
-            if self.currentToken.token == '(':
-                self.tokenCheck('(')
-                self.condition()
-            
-            elif self.currentToken.token == ')':
-                self.tokenCheck(')')
-                self.condition()
-        elif self.currentToken.tokenType in ['identifier', 'number']:
-            self.nextToken() 
+        elif self.currentToken.token == '(':
+            self.tokenCheck('(')
             self.condition()
-        elif self.currentToken.tokenType == 'ArithmeticOperation': 
+            self.tokenCheck(')')
+        else:
             self.expression()
-            self.condition()
-        elif self.currentToken.token == ',':
-            self.nextToken()
-            self.condition()
+            if self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
+                self.nextToken()
+                self.expression()
+            
+            # elif self.currentToken.tokenType in ['identifier', 'number']:
+            #     self.expression()
+
 
     def expression(self):
         
@@ -585,9 +614,21 @@ class SyntaxAnalyzer:
                 else:
                     self.tokenCheck('-')
                 self.term()
-                if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}': 
-                    self.expression()
+                # if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}': 
+                #     self.expression()
         return self.currentToken.token
+    
+    # def expression(self):
+    #     global token
+    #     # optional sign term
+    #     if token.recognized_string=='+' or token.recognized_string=='-':
+    #         token = self.get_token()
+            
+    #     #print('from expression:' +str(token))
+    #     self.term()
+    #     while token.recognized_string=='+' or token.recognized_string=='-' or token.recognized_string=='%':
+    #         token = self.get_token()
+    #         self.term()
     
     def optional_sign(self):
         if self.currentToken.token == '+':
@@ -607,22 +648,47 @@ class SyntaxAnalyzer:
             self.factor()
         return self.currentToken.token
 
-    def factor(self):
-        if self.currentToken.tokenType in ['identifier', 'number', 'keyword']:
-            self.nextToken()
-            if self.currentToken.token == '(':
-                self.tokenCheck('(')
-                self.expression()
-                self.tokenCheck(')')
+    # def factor(self):
+    #     if self.currentToken.tokenType in ['identifier', 'number', 'keyword']:
+    #         self.nextToken() #changing this
+    #         if self.currentToken.token == '(':
+    #             self.tokenCheck('(')
+    #             self.expression()
+    #             self.tokenCheck(')')
+    
             
+        # elif self.currentToken.token == '(':
+        #     self.tokenCheck('(')
+        #     self.expression()
+        #     self.tokenCheck(')')
+        #     self.bool_factor()
+        # print(self.currentToken.token)
+        # return self.currentToken.token
+    
+    def factor(self):
+        if self.currentToken.tokenType in [ 'number', 'keyword']:
+            self.nextToken()
         elif self.currentToken.token == '(':
             self.tokenCheck('(')
             self.expression()
             self.tokenCheck(')')
-            self.bool_factor()
-        print(self.currentToken.token)
+        elif self.currentToken.tokenType == 'identifier':
+            self.nextToken()
+            self.idtail()
         return self.currentToken.token
     
+    def idtail(self):
+        if self.currentToken.token == '(':
+            self.tokenCheck('(')
+            self.actual_pars()
+            self.tokenCheck(')')
+    
+    def actual_pars(self):
+        self.expression()
+        while self.currentToken.token == ',':
+            self.tokenCheck(',')
+            self.expression()
+
     def syntaxCorect(self):
         if self.currentToken.tokenType == 'EOF':
             self.syntaxFile.write("\n\nEnding Token: "+self.currentToken.token+"Index of Ending Token: "+str(self.tokenIndex))
