@@ -682,7 +682,6 @@ class SyntaxAnalyzer:
         if self.currentToken.tokenType in [ 'number', 'keyword']:
             res = self.currentToken.token
             self.nextToken()
-            self.factor()
         elif self.currentToken.token == '(':
             res = self.currentToken.token
             self.tokenCheck('(')
@@ -692,24 +691,27 @@ class SyntaxAnalyzer:
             res = self.currentToken.token
             self.nextToken()
             tail = self.idtail()
+            # print(tail)
             if(tail):
                 Quadruple.genquad('call',res,'_', '_')
                 Quadruple.functionFormat('call',res,'_', '_')        
         return res
     
     def idtail(self):
+        res = ''
         if self.currentToken.token == '(':
             self.tokenCheck('(')
-            self.actual_pars()
+            res =self.actual_pars()
             self.tokenCheck(')')
-        return  self.currentToken.token
+        return res
     
     def actual_pars(self):
-        self.expression()
+        res = ''
+        res = self.expression()
         while self.currentToken.token == ',':
             self.tokenCheck(',')
-            self.expression()
-        return self.currentToken.token
+            res =self.expression()
+        return res
 
     def syntaxCorect(self):
         if self.currentToken.tokenType == 'EOF':
