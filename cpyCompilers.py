@@ -819,7 +819,7 @@ lex = LexicalAnalyzer(fileName)
 tokens = lex.lexical_analyzer()
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
-quad = Quadruple.genquad('+','x','y','z')
+# quad = Quadruple.genquad('+','x','y','z')
 
 with open('quadruples.txt', 'w') as f:
     line = 1
