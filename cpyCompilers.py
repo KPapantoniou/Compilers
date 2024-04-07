@@ -14,6 +14,7 @@ temporaryVariables = []
 quadrupleList = []
 lineCount =0
 tempVariableCount =0 
+isFunction = False
 class Token:
     def __init__(self, token, tokenType):
         self.token = token 
@@ -439,6 +440,7 @@ class SyntaxAnalyzer:
             self.other_statements()
 
     def assignment_statements(self):
+        global isFunction
         if self.currentToken.tokenType == 'identifier':
             result = self.currentToken.token
             self.nextToken()
@@ -449,8 +451,14 @@ class SyntaxAnalyzer:
         expression = self.expression()
         # print(expression)
         # print(expression,'\t',result)
-        Quadruple.genquad('=',expression,'_',result)
-        Quadruple.functionFormat('=',expression,'_',result)
+        if isFunction:
+            Quadruple.genquad('=',temporaryVariables[-1],'_',result)
+            Quadruple.functionFormat('=',temporaryVariables[-1],'_',result)
+            # print(temporaryVariables[-1])
+            isFunction = False
+        else:
+            Quadruple.genquad('=',expression,'_',result)
+            Quadruple.functionFormat('=',expression,'_',result)
 
     def other_statements(self):
         if self.currentToken.token == 'if':
@@ -515,8 +523,11 @@ class SyntaxAnalyzer:
     def print_statements(self):
         self.tokenCheck('print')
         self.tokenCheck('(')
-        self.expression()
+        expression = self.expression()
+        out = self.currentToken.token
         self.tokenCheck(')')
+        Quadruple.genquad('out',expression,'_','_')
+        Quadruple.functionFormat('out',expression,'_','_')
 
     def input_statements(self):
         self.tokenCheck('int')
@@ -625,6 +636,7 @@ class SyntaxAnalyzer:
                     self.tokenCheck('-')
                 
                 second_place = self.term()
+                # print(first_place)
                 # print(second_place)
                 z = Quadruple.newtemp()
                 Quadruple.genquad(operator, first_place, second_place,z)
@@ -634,6 +646,7 @@ class SyntaxAnalyzer:
                 
                 # if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}': 
                 #     self.expression()
+        
         return  new_temp
     
     
@@ -650,16 +663,25 @@ class SyntaxAnalyzer:
         return sign
 
     def term(self):
+        temp = ''
         res = self.factor()
+        operator =''
         while self.currentToken.token in ['*', '//', '%']:
-            if self.currentToken.token == '*':
+            operator = self.currentToken.token
+            if self.currentToken.token == '*':                
                 self.tokenCheck('*')
-            elif self.currentToken.token == '//':
+            elif self.currentToken.token == '//':                
                 self.tokenCheck('//')
-            else:
+            else:                
                 self.tokenCheck('%')
-            res = self.factor()
-        return res
+            res2 = self.factor()
+            z = Quadruple.newtemp()
+            Quadruple.genquad(operator,res,res2,z)
+            Quadruple.functionFormat(operator,res,res2,z)
+            res= z
+        temp = res
+        # print(temp)
+        return temp
 
     # def factor(self):
     #     if self.currentToken.tokenType in ['identifier', 'number', 'keyword']:
@@ -686,33 +708,47 @@ class SyntaxAnalyzer:
         elif self.currentToken.token == '(':
             res = self.currentToken.token
             self.tokenCheck('(')
-            res =self.expression()
+            exp =self.expression()
             self.tokenCheck(')')
+            res = exp
         elif self.currentToken.tokenType == 'identifier':
             res = self.currentToken.token
             self.nextToken()
-            tail = self.idtail()
+            tail = self.idtail(res)
             # print(tail)
-            if(tail):
-                Quadruple.genquad('call',res,'_', '_')
-                Quadruple.functionFormat('call',res,'_', '_')  
-                res = tail      
+            # if(tail!=''):
+            #     # Quadruple.genquad('call',res,'_', '_')
+            #     # Quadruple.functionFormat('call',res,'_', '_')  
+            #     res = tail      
         return res
     
-    def idtail(self):
+    def idtail(self,name):
+        global isFunction
         res = ''
         if self.currentToken.token == '(':
+            isFunction = True
             self.tokenCheck('(')
             res =self.actual_pars()
             self.tokenCheck(')')
+            new_temp = Quadruple.newtemp()
+            Quadruple.genquad('par',new_temp,'RET','_')
+            Quadruple.functionFormat('par',new_temp,'RET','_')
+            
+            
+            Quadruple.genquad('call',name,'_','_')
+            Quadruple.functionFormat('call',name,'_','_')
         return res
     
     def actual_pars(self):
         res = ''
         res = self.expression()
+        Quadruple.genquad('par',res,'CV','_')
+        Quadruple.functionFormat('par',res,'CV','_')
         while self.currentToken.token == ',':
             self.tokenCheck(',')
             res =self.expression()
+            Quadruple.genquad('par',res,'CV','_')
+            Quadruple.functionFormat('par',res,'CV','_')
         return res
 
     def syntaxCorect(self):
@@ -734,7 +770,7 @@ class Quadruple:
         
 
     def functionFormat(operation, x, y, z):
-        
+        global lineCount
         print(lineCount,":" + operation +","+ x + "," + y + "," + z,'\n')
         
         # return lineCount,":" + operation +","+ x + "," + self.y + "," + self.z
@@ -785,9 +821,15 @@ syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
 quad = Quadruple.genquad('+','x','y','z')
 
-# temp = quad.newtemp()
-# for quad in quadrupleList:
-#     quad.functionFormat()
+with open('quadruples.txt', 'w') as f:
+    line = 1
+    for quadruple in quadrupleList:
+        # Construct each line with proper formatting
+        line_to_write = f"{line}: {quadruple.operation},{quadruple.x},{quadruple.y},{quadruple.z}\n"
+        f.write(line_to_write)
+        line += 1
+
+    
 
 
 
