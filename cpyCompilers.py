@@ -386,7 +386,7 @@ class SyntaxAnalyzer:
     def def_function(self):
         programName = self.currentToken.token
         Quadruple.genquad("begin_block",programName,'_','_')
-        Quadruple.functionFormat("begin_block",programName,'_','_')
+        # Quadruple.functionFormat("begin_block",programName,'_','_')
         if self.currentToken.tokenType == 'identifier':
             self.nextToken()
             if self.tokenCheck('('):
@@ -410,13 +410,8 @@ class SyntaxAnalyzer:
                                 # Quadruple.genquad("halt",'_','_','_')
                                 # Quadruple.functionFormat("halt",'_','_','_')
                                 Quadruple.genquad("end_block",programName,'_','_')
-                                Quadruple.functionFormat("end_block",programName,'_','_')
+                                # Quadruple.functionFormat("end_block",programName,'_','_')
                                 return True
-        
-        # else:
-        #     print(f"Syntax error: expected #{{ received {self.currentToken.token}")
-        #     print(f"Line : {self.tokenIndex}")
-        #     raise Exception("Unexpected token received")
 
     def declarations(self):
         if self.currentToken.tokenType == 'identifier':
@@ -456,16 +451,14 @@ class SyntaxAnalyzer:
         
         self.other_statements()
         expression = self.expression()
-        # print(expression)
-        # print(expression,'\t',result)
         if isFunction:
             Quadruple.genquad('=',temporaryVariables[-1],'_',result)
-            Quadruple.functionFormat('=',temporaryVariables[-1],'_',result)
-            # print(temporaryVariables[-1])
             isFunction = False
         else:
-            Quadruple.genquad('=',expression,'_',result)
-            Quadruple.functionFormat('=',expression,'_',result)
+            if temporaryVariables:
+                Quadruple.genquad('=',temporaryVariables[-1],'_',result)
+            else:
+                Quadruple.genquad('=',expression,'_',result)
 
     def other_statements(self):
         if self.currentToken.token == 'if':
@@ -480,44 +473,42 @@ class SyntaxAnalyzer:
             self.input_statements()
 
     def if_statements(self):
-        global lineCount
+        global lineCount,quadrupleList
         self.tokenCheck('if')        
 
-        cond_result = self.condition()
-        true_label = Quadruple.newtemp()
-        false_label = Quadruple.newtemp()
-
-        # Quadruple.genquad("jump", cond_result, '_', true_label)
-        Quadruple.genquad("jump", '_', '_', lineCount-1)
-
-        true_list = Quadruple.makelist(true_label)
-        Quadruple.backpatch(true_list, true_label)
-
-
+        cond_result = self.condition()     
+        print(f"here: -> {cond_result[0]} quad id: {quadrupleList[-1].id}")
         self.tokenCheck(':')
+        
+        Quadruple.backpatch(cond_result[0],Quadruple.nextquad())
+        # print(quadrupleList[-1])
         self.code_block()
-
-        end_label = Quadruple.newtemp()
-        Quadruple.genquad("jump", '_', '_', end_label)
-
-        false_list = Quadruple.makelist(false_label)
-        Quadruple.backpatch(false_list, false_label)
-
+        if_statment = Quadruple.makelist(Quadruple.nextquad())
+        Quadruple.genquad('jump','_','_','_')
+        Quadruple.backpatch(cond_result[1],Quadruple.nextquad())
+        
 
         if self.currentToken.token == '#{':
             self.tokenCheck('#{')
+            
             self.code_block()
+            Quadruple.backpatch(cond_result[0],Quadruple.nextquad())
+
+            self.code_block()
+            if_statment = Quadruple.makelist(Quadruple.nextquad())
+            Quadruple.genquad('jump','_','_','_')
+            Quadruple.backpatch(cond_result[1],Quadruple.nextquad())
+
             self.tokenCheck('#}')
 
         while self.currentToken.token == 'elif':
             self.elif_statements()
+        
         if self.currentToken.token == 'else':
             self.else_statements()
+            Quadruple.backpatch(if_statment,Quadruple.nextquad())
 
-        Quadruple.genquad("jump", '_', '_', end_label)
-        Quadruple.backpatch(Quadruple.makelist(end_label), Quadruple.nextquad())
-
-
+        
     def elif_statements(self):
         self.tokenCheck('elif')
         self.condition()
@@ -560,7 +551,7 @@ class SyntaxAnalyzer:
         
         self.tokenCheck(')')
         Quadruple.genquad('out',expression,'_','_')
-        Quadruple.functionFormat('out',expression,'_','_')
+        # Quadruple.functionFormat('out',expression,'_','_')
 
     def input_statements(self):
         self.tokenCheck('int')
@@ -575,34 +566,55 @@ class SyntaxAnalyzer:
             self.statements()
 
     def condition(self):
-        bool_terms = [self.bool_term()]
+        cond_true = []
+        cond_false = []
+        cond_true,cond_false = self.bool_term()
         z =''
         while self.currentToken.token == 'or':            
             self.tokenCheck('or')
-            bool_terms.append(self.bool_term())
-            z= Quadruple.newtemp()
-            Quadruple.genquad("or",bool_terms[0],bool_terms[1],z)
-        
-        return z
+            # bool_terms.append(self.bool_term())
+            if cond_false:
+                Quadruple.backpatch(cond_false,Quadruple.nextquad())
+            bool_term2 = self.bool_term()
+
+            cond_true = Quadruple.mergelist(cond_true,bool_term2[0])
+            # print(f"Here: {cond_true}")
+            cond_false = bool_term2[1]
+            # z= Quadruple.nextquad()
+            # Quadruple.genquad("or",bool_terms[0],bool_terms[1],z)
+        print(cond_true)
+        return cond_true,cond_false
     
     def bool_term(self):
-        res =self.bool_factor()
+        B_true = []
+        B_false = []
+        B_true,B_false =self.bool_factor()
         # print(f"Here the rsult of bool_factor: {res}\n")
         while self.currentToken.token == 'and':
             self.tokenCheck('and')
-            res=  self.bool_factor()
-        return res
+            Quadruple.backpatch(B_true,Quadruple.nextquad())
+            bool_factor =  self.bool_factor()
+
+            B_false= Quadruple.mergelist(B_false,bool_factor[1])
+            B_true = bool_factor[0]
+        return B_true,B_false
 
     def bool_factor(self):
+        B_true = []
+        B_false = []
         if self.currentToken.token == 'not':
             self.tokenCheck('not')
-            self.condition()
-            result = Quadruple.newtemp()
-            Quadruple.genquad("!", self.currentToken.token, '_', result)
+            condition = self.condition()
+            # result = Quadruple.nextquad()
+            # Quadruple.genquad("!", self.currentToken.token, '_', result)
+            B_true = condition[0]
+            B_false = condition[1]
         elif self.currentToken.token == '(':
             self.tokenCheck('(')
-            self.condition()
+            condition = self.condition()
             self.tokenCheck(')')
+            B_true = condition[0]
+            B_false = condition[1]
         else:
             first_part = self.currentToken.token
             self.expression()
@@ -611,10 +623,15 @@ class SyntaxAnalyzer:
                 self.nextToken()
                 second_part = self.currentToken.token
                 self.expression()
-                result = Quadruple.newtemp()
-                Quadruple.genquad(op, first_part, second_part, result)
+                # result = Quadruple.nextquad()
+                B_true = Quadruple.makelist(Quadruple.nextquad())
+                Quadruple.genquad(op, first_part, second_part,'_')
+                jump_target = Quadruple.nextquad()
+                B_false = Quadruple.makelist(Quadruple.nextquad())
+                Quadruple.genquad('jump','_','_','_')
+                
             
-        return result
+        return B_true,B_false
 
 
     def expression(self):
@@ -644,17 +661,9 @@ class SyntaxAnalyzer:
                     self.tokenCheck('-')
                 
                 second_place = self.term()
-                # print(first_place)
-                # print(second_place)
                 z = Quadruple.newtemp()
                 Quadruple.genquad(operator, first_place, second_place,z)
-                Quadruple.functionFormat(operator, first_place, second_place,z)
-                new_temp = z
-                # print(operator, firs_place, second_place,z)
-                
-                # if self.currentToken.token not in ['+', '-', '='] and self.currentToken.token != '#}': 
-                #     self.expression()
-        
+
         return  first_place
     
     
@@ -685,28 +694,11 @@ class SyntaxAnalyzer:
             res2 = self.factor()
             z = Quadruple.newtemp()
             Quadruple.genquad(operator,res,res2,z)
-            Quadruple.functionFormat(operator,res,res2,z)
+            # Quadruple.functionFormat(operator,res,res2,z)
             res= z
         temp = res
         # print(temp)
         return temp
-
-    # def factor(self):
-    #     if self.currentToken.tokenType in ['identifier', 'number', 'keyword']:
-    #         self.nextToken() #changing this
-    #         if self.currentToken.token == '(':
-    #             self.tokenCheck('(')
-    #             self.expression()
-    #             self.tokenCheck(')')
-    
-            
-        # elif self.currentToken.token == '(':
-        #     self.tokenCheck('(')
-        #     self.expression()
-        #     self.tokenCheck(')')
-        #     self.bool_factor()
-        # print(self.currentToken.token)
-        # return self.currentToken.token
     
     def factor(self):
         res = ''
@@ -723,11 +715,6 @@ class SyntaxAnalyzer:
             res = self.currentToken.token
             self.nextToken()
             tail = self.idtail(res)
-            # print(tail)
-            # if(tail!=''):
-            #     # Quadruple.genquad('call',res,'_', '_')
-            #     # Quadruple.functionFormat('call',res,'_', '_')  
-            #     res = tail      
         return res
     
     def idtail(self,name):
@@ -740,23 +727,21 @@ class SyntaxAnalyzer:
             self.tokenCheck(')')
             new_temp = Quadruple.newtemp()
             Quadruple.genquad('par',new_temp,'RET','_')
-            Quadruple.functionFormat('par',new_temp,'RET','_')
-            
-            
+
             Quadruple.genquad('call',name,'_','_')
-            Quadruple.functionFormat('call',name,'_','_')
+
         return res
     
     def actual_pars(self):
         res = ''
         res = self.expression()
         Quadruple.genquad('par',res,'CV','_')
-        Quadruple.functionFormat('par',res,'CV','_')
+
         while self.currentToken.token == ',':
             self.tokenCheck(',')
             res =self.expression()
             Quadruple.genquad('par',res,'CV','_')
-            Quadruple.functionFormat('par',res,'CV','_')
+
         return res
 
     def syntaxCorect(self):
@@ -769,14 +754,18 @@ class SyntaxAnalyzer:
 ##------------------------------------ Intermediate Code -------------------------------##
   
 class Quadruple:
-
+    current_id = 0
     def __init__(self, operation, x, y, z):
+        self.id = Quadruple.current_id
+        Quadruple.current_id+=1
         self.operation = str(operation)
         self.x = str(x)
         self.y = str(y)
         self.z = str(z)
         
-
+    def __str__(self):
+        return f"({self.operation}, {self.x}, {self.y}, {self.z})"
+    
     @staticmethod
     def functionFormat(operation, x, y, z):
         global lineCount
@@ -787,12 +776,13 @@ class Quadruple:
 
         global lineCount
         lineCount += 1
-        return 
+        
+        return lineCount
 
 
     def genquad(operation, x, y, z):
         global quadrupleList, lineCount
-                
+        # self.id += 1
         newQuad = Quadruple(operation, x, y, z)
         newQuad.nextquad()
         quadrupleList.append(newQuad)
@@ -816,10 +806,22 @@ class Quadruple:
         newList.append(x)
         return newList
 
+    # def backpatch(list,z):
+    #     for quadruple in quadrupleList:
+    #         if quadruple in list:
+    #             quadruple[-1] = str(z)
+
     def backpatch(list,z):
-        for quadruple in quadrupleList:
-            if quadruple in list:
-                quadruple[-1] = str(z)
+        global quadrupleList
+        for quad in quadrupleList:
+            # print(type(quad.id))
+            # print(type(list[0]))
+            if quad.id in list:
+                print("Found!")
+                quad.z = str(z)
+
+
+
 
 ##-------------------------------------------- Main --------------------------------------------##
 
@@ -833,7 +835,7 @@ with open('quadruples.txt', 'w') as f:
     line = 1
     for quadruple in quadrupleList:
         # Construct each line with proper formatting
-        line_to_write = f"{line}: {quadruple.operation},{quadruple.x},{quadruple.y},{quadruple.z}\n"
+        line_to_write = f"{quadruple.id}: {quadruple.operation},{quadruple.x},{quadruple.y},{quadruple.z}\n"
         f.write(line_to_write)
         line += 1
 
