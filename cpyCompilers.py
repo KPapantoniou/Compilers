@@ -617,15 +617,16 @@ class SyntaxAnalyzer:
             B_false = condition[1]
         else:
             first_part = self.currentToken.token
-            self.expression()
+            ex1 = self.expression()
             if self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
                 op = self.currentToken.token
                 self.nextToken()
                 second_part = self.currentToken.token
-                self.expression()
+                ex2 = self.expression()
                 # result = Quadruple.nextquad()
                 B_true = Quadruple.makelist(Quadruple.nextquad())
-                Quadruple.genquad(op, first_part, second_part,'_')
+                # Quadruple.genquad(op, first_part, second_part,'_')
+                Quadruple.genquad(op, ex1, ex2,'_')
                 jump_target = Quadruple.nextquad()
                 B_false = Quadruple.makelist(Quadruple.nextquad())
                 Quadruple.genquad('jump','_','_','_')
@@ -663,7 +664,7 @@ class SyntaxAnalyzer:
                 second_place = self.term()
                 z = Quadruple.newtemp()
                 Quadruple.genquad(operator, first_place, second_place,z)
-
+                first_place = z
         return  first_place
     
     
