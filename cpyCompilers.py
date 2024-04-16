@@ -510,8 +510,9 @@ class SyntaxAnalyzer:
 
         
     def elif_statements(self):
+        
         self.tokenCheck('elif')
-        self.condition()
+        cond_true,cond_false =self.condition()
         self.tokenCheck(':')
         self.code_block()
         if self.currentToken.token == '#{':
@@ -530,12 +531,20 @@ class SyntaxAnalyzer:
 
     def while_statements(self):
         self.tokenCheck('while')
-        self.condition()
+        quad = Quadruple.nextquad()
+        cond_true,cond_false = self.condition()
         self.tokenCheck(':')
+        Quadruple.backpatch(cond_true,Quadruple.nextquad())
         self.code_block()
+        Quadruple.genquad('jump','_','_',quad)
+        Quadruple.backpatch(cond_false,Quadruple.nextquad())
+        
         if self.currentToken.token == '#{':
             self.tokenCheck('#{')
+            Quadruple.backpatch(cond_true,Quadruple.nextquad())
             self.code_block()
+            Quadruple.genquad('jump','_','_',quad)
+            Quadruple.backpatch(cond_false,Quadruple.nextquad())
             self.tokenCheck('#}')
 
     def return_statements(self):
