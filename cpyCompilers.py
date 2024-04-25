@@ -445,6 +445,7 @@ class SyntaxAnalyzer:
         global isFunction
         if self.currentToken.tokenType == 'identifier':
             result = self.currentToken.token
+            print(result)
             self.nextToken()
        
         self.tokenCheck('=')
@@ -503,7 +504,7 @@ class SyntaxAnalyzer:
 
         while self.currentToken.token == 'elif':
             self.elif_statements()
-        
+            # Quadruple.backpatch(if_statment,Quadruple.nextquad())
         if self.currentToken.token == 'else':
             self.else_statements()
             Quadruple.backpatch(if_statment,Quadruple.nextquad())
@@ -514,7 +515,9 @@ class SyntaxAnalyzer:
         self.tokenCheck('elif')
         cond_true,cond_false =self.condition()
         self.tokenCheck(':')
+        Quadruple.backpatch(cond_true,Quadruple.nextquad())
         self.code_block()
+        Quadruple.backpatch(cond_false,Quadruple.nextquad())
         if self.currentToken.token == '#{':
             self.tokenCheck('#{')
             self.code_block()
@@ -535,7 +538,11 @@ class SyntaxAnalyzer:
         cond_true,cond_false = self.condition()
         self.tokenCheck(':')
         Quadruple.backpatch(cond_true,Quadruple.nextquad())
-        self.code_block()
+        print(self.currentToken.token,'oooooooo')
+        # self.code_block()
+        self.statements()
+        # while_statment = Quadruple.makelist(Quadruple.nextquad())
+        print(self.currentToken.token,'AAAAAAAA')
         Quadruple.genquad('jump','_','_',quad)
         Quadruple.backpatch(cond_false,Quadruple.nextquad())
         
@@ -543,9 +550,11 @@ class SyntaxAnalyzer:
             self.tokenCheck('#{')
             Quadruple.backpatch(cond_true,Quadruple.nextquad())
             self.code_block()
+            # self.statements()
             Quadruple.genquad('jump','_','_',quad)
             Quadruple.backpatch(cond_false,Quadruple.nextquad())
             self.tokenCheck('#}')
+        # Quadruple.backpatch(while_statment,Quadruple.nextquad())
 
     def return_statements(self):
         self.tokenCheck('return')
@@ -785,7 +794,7 @@ class Quadruple:
     def nextquad(cls):
 
         global lineCount
-        lineCount += 1
+        # lineCount += 1
         
         return lineCount
 
@@ -793,8 +802,9 @@ class Quadruple:
     def genquad(operation, x, y, z):
         global quadrupleList, lineCount
         # self.id += 1
+        lineCount +=1
         newQuad = Quadruple(operation, x, y, z)
-        newQuad.nextquad()
+        # newQuad.nextquad()
         quadrupleList.append(newQuad)
 
     def emptylist():
@@ -824,8 +834,6 @@ class Quadruple:
     def backpatch(list,z):
         global quadrupleList
         for quad in quadrupleList:
-            # print(type(quad.id))
-            # print(type(list[0]))
             if quad.id in list:
                 print("Found!")
                 quad.z = str(z)
@@ -842,7 +850,7 @@ syntax.startRule()
 # quad = Quadruple.genquad('+','x','y','z')
 
 with open('quadruples.txt', 'w') as f:
-    line = 1
+    line = 0
     for quadruple in quadrupleList:
         # Construct each line with proper formatting
         line_to_write = f"{quadruple.id}: {quadruple.operation},{quadruple.x},{quadruple.y},{quadruple.z}\n"
