@@ -1,0 +1,7 @@
+Exiting a scope, printing current state of Symbol table
+scope:0
+	Param: name: x, mode: in offset: 12
+Exiting a scope, printing current state of Symbol table
+scope:0
+	Variable: name: x, offset: 12
+	TempVar: name: T_1, offset: 16
