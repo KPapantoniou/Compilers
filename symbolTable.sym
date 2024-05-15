@@ -1,0 +1,66 @@
+Exiting a scope, printing current state of Symbol table
+scope:0
+	Variable: name: var1, offset: 12
+	Variable: name: var2, offset: 16
+	Func: name: func1 startquad:None framelen:None number of parameters: 0
+scope:1
+	Variable: name: cover, offset: 12
+	Func: name: func2 startquad:None framelen:None number of parameters: 0
+scope:2
+	Variable: name: cover, offset: 12
+	Func: name: func3 startquad:None framelen:None number of parameters: 0
+scope:3
+	Variable: name: cover, offset: 12
+	Func: name: func4 startquad:0 framelen:28 number of parameters: 0
+scope:4
+	Variable: name: localvar, offset: 12
+	Variable: name: cover, offset: 16
+	Variable: name: var2, offset: 20
+	TempVar: name: T_1, offset: 24
+Exiting a scope, printing current state of Symbol table
+scope:0
+	Variable: name: var1, offset: 12
+	Variable: name: var2, offset: 16
+	Func: name: func1 startquad:None framelen:None number of parameters: 0
+scope:1
+	Variable: name: cover, offset: 12
+	Func: name: func2 startquad:None framelen:None number of parameters: 0
+scope:2
+	Variable: name: cover, offset: 12
+	Func: name: func3 startquad:8 framelen:24 number of parameters: 0
+scope:3
+	Variable: name: cover, offset: 12
+	Func: name: func4 startquad:0 framelen:28 number of parameters: 0
+	TempVar: name: T_2, offset: 16
+	TempVar: name: T_3, offset: 20
+Exiting a scope, printing current state of Symbol table
+scope:0
+	Variable: name: var1, offset: 12
+	Variable: name: var2, offset: 16
+	Func: name: func1 startquad:None framelen:None number of parameters: 0
+scope:1
+	Variable: name: cover, offset: 12
+	Func: name: func2 startquad:16 framelen:24 number of parameters: 0
+scope:2
+	Variable: name: cover, offset: 12
+	Func: name: func3 startquad:8 framelen:24 number of parameters: 0
+	TempVar: name: T_4, offset: 16
+	TempVar: name: T_5, offset: 20
+Exiting a scope, printing current state of Symbol table
+scope:0
+	Variable: name: var1, offset: 12
+	Variable: name: var2, offset: 16
+	Func: name: func1 startquad:24 framelen:24 number of parameters: 0
+scope:1
+	Variable: name: cover, offset: 12
+	Func: name: func2 startquad:16 framelen:24 number of parameters: 0
+	TempVar: name: T_6, offset: 16
+	TempVar: name: T_7, offset: 20
+Exiting a scope, printing current state of Symbol table
+scope:0
+	Variable: name: var1, offset: 12
+	Variable: name: var2, offset: 16
+	Func: name: func1 startquad:24 framelen:24 number of parameters: 0
+	Proc: name: main startingQuad: 32 framelen: 16 number of parameters: 0
+scope:1
+	TempVar: name: T_8, offset: 12
