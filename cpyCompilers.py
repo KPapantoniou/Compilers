@@ -9,11 +9,12 @@
 # from sys import argv
 
 # fileName = argv[1] 
-fileName = './variable_scope_test.cpy'
+fileName = './test5.cpy'
 temporaryVariables = []
 quadrupleList = []
 lineCount =0
 tempVariableCount =0 
+
 isFunction = False
 class Token:
     def __init__(self, token, tokenType):
@@ -427,9 +428,6 @@ class SyntaxAnalyzer:
             Quadruple.genquad("end_block",programName,'_','_')
             self.symbol_table.exit_scope()
             if self.tokenCheck('#}'):
-                # Quadruple.genquad("halt",'_','_','_')
-                # Quadruple.functionFormat("halt",'_','_','_')
-                # Quadruple.functionFormat("end_block",programName,'_','_')
                 return True
 
     def declarations(self):
@@ -447,7 +445,6 @@ class SyntaxAnalyzer:
         if self.currentToken.tokenType == 'identifier':
             param_list.append(self.currentToken.token)
             self.nextToken()
-            
             while self.currentToken.token == ',':
                 self.tokenCheck(',')
                 if self.currentToken.tokenType == 'identifier':
@@ -472,7 +469,6 @@ class SyntaxAnalyzer:
         global isFunction
         if self.currentToken.tokenType == 'identifier':
             result = self.currentToken.token
-            # print(result)
             self.nextToken()
         self.tokenCheck('=')
         self.other_statements(result)
@@ -502,10 +498,8 @@ class SyntaxAnalyzer:
         global lineCount,quadrupleList
         self.tokenCheck('if')        
         cond_result = self.condition()     
-        # print(f"here: -> {cond_result[0]} quad id: {quadrupleList[-1].id}")
         self.tokenCheck(':')
         Quadruple.backpatch(cond_result[0],Quadruple.nextquad())
-        # print(quadrupleList[-1])
         self.code_block()
         if_statment = Quadruple.makelist(Quadruple.nextquad())
         Quadruple.genquad('jump','_','_','_')
@@ -521,7 +515,6 @@ class SyntaxAnalyzer:
             self.tokenCheck('#}')
         while self.currentToken.token == 'elif':
             self.elif_statements()
-            # Quadruple.backpatch(if_statment,Quadruple.nextquad())
         if self.currentToken.token == 'else':
             self.else_statements()
             Quadruple.backpatch(if_statment,Quadruple.nextquad())
@@ -553,11 +546,7 @@ class SyntaxAnalyzer:
         cond_true,cond_false = self.condition()
         self.tokenCheck(':')
         Quadruple.backpatch(cond_true,Quadruple.nextquad())
-        # print(self.currentToken.token,'oooooooo')
-        # self.code_block()
         self.statements()
-        # while_statment = Quadruple.makelist(Quadruple.nextquad())
-        # print(self.currentToken.token,'AAAAAAAA')
         Quadruple.genquad('jump','_','_',quad)
         Quadruple.backpatch(cond_false,Quadruple.nextquad())
         
@@ -565,16 +554,13 @@ class SyntaxAnalyzer:
             self.tokenCheck('#{')
             Quadruple.backpatch(cond_true,Quadruple.nextquad())
             self.code_block()
-            # self.statements()
             Quadruple.genquad('jump','_','_',quad)
             Quadruple.backpatch(cond_false,Quadruple.nextquad())
             self.tokenCheck('#}')
-        # Quadruple.backpatch(while_statment,Quadruple.nextquad())
 
     def return_statements(self):
         self.tokenCheck('return')
         expression = self.expression()
-        # print(f"the expression inside the reterun statment: {expression}")
         Quadruple.genquad('retv',expression,'_','_')
 
     def print_statements(self):
@@ -583,7 +569,6 @@ class SyntaxAnalyzer:
         expression = self.expression()
         self.tokenCheck(')')
         Quadruple.genquad('out',expression,'_','_')
-        # Quadruple.functionFormat('out',expression,'_','_')
 
     def input_statements(self, id):
         self.tokenCheck('int')
@@ -605,24 +590,18 @@ class SyntaxAnalyzer:
         z =''
         while self.currentToken.token == 'or':            
             self.tokenCheck('or')
-            # bool_terms.append(self.bool_term())
             if cond_false:
                 Quadruple.backpatch(cond_false,Quadruple.nextquad())
             bool_term2 = self.bool_term()
 
             cond_true = Quadruple.mergelist(cond_true,bool_term2[0])
-            # print(f"Here: {cond_true}")
             cond_false = bool_term2[1]
-            # z= Quadruple.nextquad()
-            # Quadruple.genquad("or",bool_terms[0],bool_terms[1],z)
-        # print(cond_true)
         return cond_true,cond_false
     
     def bool_term(self):
         B_true = []
         B_false = []
         B_true,B_false =self.bool_factor()
-        # print(f"Here the rsult of bool_factor: {res}\n")
         while self.currentToken.token == 'and':
             self.tokenCheck('and')
             Quadruple.backpatch(B_true,Quadruple.nextquad())
@@ -638,8 +617,6 @@ class SyntaxAnalyzer:
         if self.currentToken.token == 'not':
             self.tokenCheck('not')
             condition = self.condition()
-            # result = Quadruple.nextquad()
-            # Quadruple.genquad("!", self.currentToken.token, '_', result)
             B_true = condition[0]
             B_false = condition[1]
         elif self.currentToken.token == '(':
@@ -658,7 +635,6 @@ class SyntaxAnalyzer:
                 ex2 = self.expression()
                 # result = Quadruple.nextquad()
                 B_true = Quadruple.makelist(Quadruple.nextquad())
-                # Quadruple.genquad(op, first_part, second_part,'_')
                 Quadruple.genquad(op, ex1, ex2,'_')
                 jump_target = Quadruple.nextquad()
                 B_false = Quadruple.makelist(Quadruple.nextquad())
@@ -730,10 +706,8 @@ class SyntaxAnalyzer:
             z = Quadruple.newtemp()
             self.symbol_table.insert(TemporaryVariable(z, 'integer', None))
             Quadruple.genquad(operator,res,res2,z)
-            # Quadruple.functionFormat(operator,res,res2,z)
             res= z
         temp = res
-        # print(temp)
         return temp
     
     def factor(self):
@@ -801,7 +775,11 @@ class Quadruple:
         self.z = str(z)
         
     def __str__(self):
-        return f"({self.operation}, {self.x}, {self.y}, {self.z})"
+        return f"{self.operation}, {self.x}, {self.y}, {self.z}"
+    
+    def to_list(self):
+        return [self.operation, self.x, self.y, self.z]
+
     
     @staticmethod
     def functionFormat(operation, x, y, z):
@@ -810,20 +788,14 @@ class Quadruple:
         lineCount += 1
     @classmethod
     def nextquad(cls):
-
         global lineCount
-        # lineCount += 1
-        
         return lineCount
 
 
     def genquad(operation, x, y, z):
         global quadrupleList, lineCount
-        # self.id += 1
         lineCount +=1
         newQuad = Quadruple(operation, x, y, z)
-        # newQuad.nextquad()
-        # print(newQuad)
         quadrupleList.append(newQuad)
 
     def emptylist():
@@ -845,172 +817,12 @@ class Quadruple:
         newList.append(x)
         return newList
 
-    # def backpatch(list,z):
-    #     for quadruple in quadrupleList:
-    #         if quadruple in list:
-    #             quadruple[-1] = str(z)
 
     def backpatch(list,z):
         global quadrupleList
         for quad in quadrupleList:
             if quad.id in list:
-                # print("Found!")
                 quad.z = str(z)
-
-##------------------------------------ Symbol Table ------------------------------------##
-
-class Entity:
-    def __init__(self, name):
-        self.name = name
-
-class Variable(Entity):
-    def __init__(self, name, type, offset):
-        super().__init__(name)
-        self.type = type
-        self.offset = offset
-
-    def __str__(self):
-        return f'Variable: name: {self.name}, offset: {self.offset}'
-
-
-class TemporaryVariable(Variable):
-    def __init__(self, name, type, offset):
-        super().__init__(name, type, offset)
-
-    def __str__(self):
-        return f'TempVar: name: {self.name}, offset: {self.offset}'
-
-class Constant(Entity):
-    def __init__(self, name, type, value):
-        super().__init__(name)
-        self.type = type
-        self.value = value
-
-    def __str__(self):
-        return f'Const: name: {self.name}'
-
-
-
-class FormalParameter(Entity):
-    def __init__(self, name, type, mode):
-        super().__init__(name)
-        self.type = type
-        self.mode = mode
-
-    def __str__(self):
-        return f'FormalParam: name: {self.name}, mode: {self.mode}'
-
-
-class Parameter(FormalParameter):
-    def __init__(self, name, type, mode, offset):
-        super().__init__(name, type, mode)
-        self.offset = offset
-
-    def __str__(self):
-        return f'Param: name: {self.name}, mode: {self.mode} offset: {self.offset}'
-
-
-class Procedure(Entity):
-    def __init__(self, name, starting_quad, frame_length):
-        super().__init__(name)
-        self.starting_quad = starting_quad
-        self.frame_length = frame_length
-        self.formalParameters = []
-
-    def __str__(self):
-        return f'Proc: name: {self.name} startingQuad: {self.starting_quad} framelen: {self.frame_length}'
-
-
-class Function(Procedure):
-    def __init__(self, name, starting_quad, frame_length, type):
-        super().__init__(name, starting_quad, frame_length)
-        self.type = type
-
-    def __str__(self):
-        return f'Func: name: {self.name} startquad:{self.starting_quad} framelen:{self.frame_length}'
-
-
-class SymbolTable:
-    def __init__(self):
-        self.scopes = []
-        self.stack_position = []
-        self.current_scope = None
-        self.current_stack = -1
-        self.function_scopes = {}
-        self.outputFile = "symbolTable.txt"
-        self.fd = open(self.outputFile, "w")
-        
-
-    def __str__(self):
-        string = ''
-        for scope in self.scopes:
-            for entity in scope.values():
-                string += f'{entity}'
-
-    def enter_scope(self):
-        if len(self.scopes) > 0:
-            self.function_scopes[self.scopes[-1][-1].name] = len(self.scopes)
-        self.scopes.append([])
-        self.stack_position.append(12)
-        self.current_scope = self.scopes[-1]
-        self.current_stack += 1
-
-    def print_state(self):
-        self.fd.write("Exiting a scope, printing current state of Symbol table\n")
-        for scope in self.scopes:
-             self.fd.write(f'scope:{self.scopes.index(scope)}\n')
-             for entity in scope:
-                self.fd.write(f'\t{entity}\n')
-        # self.fd.close()
-
-    def exit_scope(self):
-        self.print_state()
-        self.scopes.pop()
-        if len(self.scopes) == 0:
-            return
-        self.current_scope = self.scopes[-1]
-        self.update(self.current_scope[-1], frame_length=self.stack_position[self.current_stack])
-        self.stack_position.pop()
-        self.current_stack -= 1
-
-    def get_last_frame_length(self):
-        return self.stack_position[self.current_stack]
-
-    def insert(self, entity):
-        if entity.__class__.__name__ == 'Parameter' or entity.__class__.__name__ == 'Variable' or entity.__class__.__name__ == 'TemporaryVariable':
-            # print(self.current_stack)
-            entity.offset = self.stack_position[self.current_stack]
-            self.stack_position[self.current_stack] += 4
-        self.current_scope.append(entity)
-
-    def varlookup(self, name):
-        scopeNum = 0
-        for scope in reversed(self.scopes):
-            scopeNum += 1
-            for entity in scope:
-                if entity.name == name:
-                    return scopeNum, entity
-        exit('Variable '+name+' not found')
-
-    def funclookup(self, name):
-        for scope in reversed(self.scopes):
-            for entity in scope:
-                if entity.name == name:
-                    if entity.__class__.__name__ == 'Procedure' or entity.__class__.__name__ == 'Function':
-                        return entity.starting_quad, entity.frame_length, entity.formalParameters
-        exit('Function not found')
-
-    def update(self, entity, frame_length=-1, starting_quad=-1):
-        if entity.__class__.__name__ == 'Function' or entity.__class__.__name__ == 'Procedure':
-            if frame_length != -1:
-                entity.frame_length = frame_length
-            if starting_quad != -1:
-                entity.starting_quad = starting_quad
-
-    def add_parameter(self, entity, formal_parameter):
-        if entity.__class__.__name__ == 'Function' or entity.__class__.__name__ == 'Procedure':
-            entity.formalParameters.append(formal_parameter)
-        
 
 
 ##------------------------------------ Symbol Table ------------------------------------##
@@ -1127,13 +939,13 @@ class SymbolTable:
 
     def insert(self, entity):
         if entity.__class__.__name__ == 'Parameter' or entity.__class__.__name__ == 'Variable' or entity.__class__.__name__ == 'TemporaryVariable':
-            # print(self.current_stack)
             entity.offset = self.stack_position[self.current_stack]
-            self.stack_position[self.current_stack] += 4 ##here
+            self.stack_position[self.current_stack] += 4 
         self.current_scope.append(entity)
 
     def varlookup(self, name):
         scopeNum = 0
+        print(self.scopes)
         for scope in reversed(self.scopes):
             scopeNum += 1
             for entity in scope:
@@ -1160,6 +972,170 @@ class SymbolTable:
         if entity.__class__.__name__ == 'Function' or entity.__class__.__name__ == 'Procedure':
             entity.formalParameters.append(formal_parameter)
         
+##-------------------------------------------- Final Code --------------------------------------##
+symbol_table = SymbolTable()
+
+def gnvlcode(v):
+    global final_codef, symbol_table
+    scope_number, entity = symbol_table.varlookup(v)
+    print(entity, scope_number,"here")
+    scope_level = len(symbol_table.scopes)
+    steps = scope_level - scope_number
+
+    final_codef.write("lw t0, -4(sp)\n")
+    
+    for _ in range(1, steps):
+        final_codef.write("lw t0, -4(t0)\n")
+
+    final_codef.write(f"addi t0, t0, -{entity.offset}\n")
+
+def loadvr(v, r):
+    global final_codef, symbol_table
+    scope_number, entity = symbol_table.varlookup(v)
+    current_scope_level = len(symbol_table.scopes)
+    
+    if isinstance(v, int):  
+        final_codef.write(f"li {r}, {v}\n")
+    elif entity.scope == 0:  
+        final_codef.write(f"lw {r}, -{entity.offset}(gp)\n")
+    elif entity.scope == current_scope_level: 
+        if isinstance(entity, TemporaryVariable) or entity.param_type == 'integer':
+            final_codef.write(f"lw {r}, -{entity.offset}(sp)\n")
+        elif entity.param_type == 'reference':
+            final_codef.write(f"lw t0, -{entity.offset}(sp)\n")
+            final_codef.write(f"lw {r}, 0(t0)\n")
+    else: 
+        gnvlcode(v)
+        if entity.param_type == 'integer' :
+            final_codef.write(f"lw {r}, 0(t0)\n")
+        elif entity.param_type == 'reference':
+            final_codef.write(f"lw t0, 0(t0)\n")
+            final_codef.write(f"lw {r}, 0(t0)\n")
+
+def storerv(r, v):
+    global final_codef, symbol_table
+    scope_number, entity = symbol_table.varlookup(v)
+    current_scope_level = len(symbol_table.scopes)
+    
+    if entity.scope == 0:  # v is a global variable
+        final_codef.write(f"sw {r}, -{entity.offset}(gp)\n")
+    elif entity.scope == current_scope_level:  # v is local to the current function
+        if isinstance(entity, TemporaryVariable) or entity.param_type == 'value':
+            final_codef.write(f"sw {r}, -{entity.offset}(sp)\n")
+        elif entity.param_type == 'reference':
+            final_codef.write(f"lw t0, -{entity.offset}(sp)\n")
+            final_codef.write(f"sw {r}, 0(t0)\n")
+    else:  # v is in an ancestor scope
+        gnvlcode(v)
+        if entity.param_type == 'value':
+            final_codef.write(f"sw {r}, 0(t0)\n")
+        elif entity.param_type == 'reference':
+            final_codef.write(f"lw t0, 0(t0)\n")
+            final_codef.write(f"sw {r}, 0(t0)\n")
+
+def final_code(quadruple,index):
+    global final_codef,symbol_table
+    
+    if quadruple[0] == 'begin_block':
+        symbol_table.enter_scope()
+        final_codef.write("Lmain:\n")
+        final_codef.write("addi sp, sp, -"+str(symbol_table.stack_position[0])+"\n")
+        final_codef.write("mv fp, sp\n")
+    elif quadruple[0] == "=":
+        final_codef.write("L" + str(line) + ":\n")
+        loadvr(quadruple[1], 't1')
+        storerv('1', quadruple[3])
+
+    elif quadruple[0] == '+':
+        final_codef.write("L" + str(line) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("add t1, t2, t1\n")
+        storerv('t1', quadruple[3])
+    elif quadruple[0] == '-':
+        final_codef.write("L" + str(line) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("sub t1, t2, t1\n")
+        storerv('t1', quadruple[3])
+    elif quadruple[0] == '*':
+        final_codef.write("L" + str(line) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("mul t1, t2, t1\n")
+        storerv('t1', quadruple[3])
+    elif quadruple[0] == '/':
+        final_codef.write("L" + str(line) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("div t1, t2, t1\n")
+        storerv('t1', quadruple[3])
+    elif quadruple[0] == '<':
+        final_codef.write("L" + str(line) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("L" + str(line) + ":\n")
+    elif quadruple[0] == '>':
+        final_codef.write("L" + str(quadruple[0].x) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("bgt t1, t2, L" + str(quadruple[3].z) + "\n")
+    elif quadruple[0] == '=':
+        final_codef.write("L" + str(quadruple[0].x) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("beq t1, t2, L" + str(quadruple[3].z) + "\n")
+    elif quadruple[0] == '!=':
+        final_codef.write("L" + str(quadrupleList[0].x) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("bne t1, t2, L" + str(quadruple[3].z) + "\n")
+    elif quadruple[0] == '<=':
+        final_codef.write("L" + str(quadruple[0].x) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("ble t1, t2, L" + str(quadruple[3].z) + "\n")
+    elif quadruple[0] == '>=':
+        final_codef.write("L" + str(quadruple[0].x) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("bge t1, t2, L" + str(quadruple[3].z) + "\n")
+    elif quadruple[0] == 'jump':
+        final_codef.write("L" + str(quadruple[0].x) + ":\n")
+        loadvr(quadruple[1], 't1')
+        loadvr(quadruple[2], 't2')
+        final_codef.write("j" + str(quadruple[3].z) + "\n")
+    elif quadruple[0] == 'retv':
+        final_codef.write("L" + str(quadruple[0].x) + ":\n")
+        loadvr(quadruple[1], 't1')
+        final_codef.write("lw t0, -8(sp)\n")
+        final_codef.write("sw t1, (t0)\n")
+        final_codef.write("jr t1\n")
+    elif quadruple[0] == 'par'and quadruple[2] == 'CV':
+        final_codef.write("L" + str(quadruple[0].x) + ":\n")
+        loadvr(quadruple[1], 't0')
+        final_codef.write("sw t0, -"+str(12 + 4*quadruple[3].offset)+"(fp)\n")
+    elif quadruple[0] == 'par' and quadruple[2] == 'RET':
+        final_codef.write("L" + str(quadruple[0].x) + ":\n")
+        final_codef.write("addi t0, sp, -"+str(quadruple[1].offset)+"\n")
+        final_codef.write("sw t0, -8(fp)\n")
+    elif quadruple[0] == 'call':
+        # symbol_table = SymbolTable()
+        scope_number, entity = symbol_table.funclookup(quadruple[1])
+        final_codef.write("L" + str(quadruple[0].x) + ":\n")
+        calling_depth = len(symbol_table.scopes) - scope_number
+        called_depth = len(symbol_table.scopes) - 1
+        if calling_depth == called_depth:
+            final_codef.write("lw t0, -4(sp)\n")
+            final_codef.write("sw t0, -4(fp)\n")
+        
+
+    
+    
+       
+    
+
+
 
 ##-------------------------------------------- Main --------------------------------------------##
 
@@ -1168,13 +1144,21 @@ tokens = lex.lexical_analyzer()
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
 # quad = Quadruple.genquad('+','x','y','z')
-
+final_codef = open('final_code.asm', 'w')
+final_codef.write(".data\n")
+final_codef.write(".text\n")
+final_codef.write("    j Lmain:\n")
 with open('quadruples.int', 'w') as f:
     line = 0
     for quadruple in quadrupleList:
         # Construct each line with proper formatting
         line_to_write = f"{quadruple.id}: {quadruple.operation},{quadruple.x},{quadruple.y},{quadruple.z}\n"
         f.write(line_to_write)
+        
+        print(quadruple.to_list())
+        final_code(quadruple.to_list(),line)
         line += 1
 
-    
+
+final_codef.close()
+
