@@ -1,41 +1,163 @@
-0: begin_block,func4,_,_
-1: =,4,_,cover
-2: =,10,_,localvar
-3: =,localvar,_,var2
-4: +,var2,localvar,T_1
-5: =,T_1,_,var1
-6: retv,cover,_,_
-7: end_block,func4,_,_
-8: begin_block,func3,_,_
-9: par,,CV,_
-10: par,T_2,RET,_
-11: call,func4,_,_
-12: =,T_2,_,cover
-13: +,cover,1,T_3
-14: retv,T_3,_,_
-15: end_block,func3,_,_
-16: begin_block,func2,_,_
-17: par,,CV,_
-18: par,T_4,RET,_
-19: call,func3,_,_
-20: =,T_4,_,cover
-21: +,cover,1,T_5
-22: retv,T_5,_,_
-23: end_block,func2,_,_
-24: begin_block,func1,_,_
-25: par,,CV,_
-26: par,T_6,RET,_
-27: call,func2,_,_
-28: =,T_6,_,cover
-29: +,cover,1,T_7
-30: retv,T_7,_,_
-31: end_block,func1,_,_
-32: begin_block,main,_,_
-33: par,,CV,_
-34: par,T_8,RET,_
-35: call,func1,_,_
-36: out,func1,_,_
-37: out,var2,_,_
-38: out,var1,_,_
-39: halt,_,_,_
-40: end_block,main,_,_
+0 glob counterFunctionCalls _ _
+1 begin_block max3 _ _
+2 + counterFunctionCalls 1 T_1
+3 := T_1 _ counterFunctionCalls
+4 > x y 6
+5 jump _ _ 10
+6 > x z 8
+7 jump _ _ 10
+8 := x _ m
+9 jump _ _ 17
+10 > y x 12
+11 jump _ _ 15
+12 > y z 14
+13 jump _ _ 15
+14 := y _ m
+15 := z _ m
+16 ret m _ _
+17 halt _ _ _
+18 end_block max3 _ _
+19 glob counterFunctionCalls _ _
+20 begin_block fib _ _
+21 + counterFunctionCalls 1 T_2
+22 := T_2 _ counterFunctionCalls
+23 < x 0 25
+24 jump _ _ 27
+25 ret -1 _ _
+26 jump _ _ 42
+27 == x 0 31
+28 jump _ _ 29
+29 == x 1 31
+30 jump _ _ 32
+31 ret 1 _ _
+32 - x 1 T_3
+33 par T_3 CV _
+34 par T_4 RET _
+35 call fib _ _
+36 - x 2 T_5
+37 par T_5 CV _
+38 par T_6 RET _
+39 call fib _ _
+40 + fib fib T_7
+41 ret T_7 _ _
+42 halt _ _ _
+43 end_block fib _ _
+44 glob counterFunctionCalls _ _
+45 begin_block divides _ _
+46 + counterFunctionCalls 1 T_8
+47 := T_8 _ counterFunctionCalls
+48 // y x T_9
+49 * T_9 x T_10
+50 == y T_10 52
+51 jump _ _ 54
+52 ret 1 _ _
+53 jump _ _ 55
+54 ret 0 _ _
+55 halt _ _ _
+56 end_block divides _ _
+57 begin_block isPrime _ _
+58 + counterFunctionCalls 1 T_11
+59 := T_11 _ counterFunctionCalls
+60 := 2 _ i
+61 < i x 64
+62 jump _ _ 75
+63 jump _ _ 61
+64 par i CV _
+65 par x CV _
+66 par T_12 RET _
+67 call divides _ _
+68 == divides 1 70
+69 jump _ _ 72
+70 ret 0 _ _
+71 jump _ _ _
+72 + i 1 T_13
+73 := T_13 _ i
+74 jump _ _ 61
+75 ret 1 _ _
+76 halt _ _ _
+77 end_block isPrime _ _
+78 glob counterFunctionCalls _ _
+79 begin_block sqr _ _
+80 + counterFunctionCalls 1 T_14
+81 := T_14 _ counterFunctionCalls
+82 * x x T_15
+83 ret T_15 _ _
+84 halt _ _ _
+85 end_block sqr _ _
+86 begin_block quad _ _
+87 + counterFunctionCalls 1 T_16
+88 := T_16 _ counterFunctionCalls
+89 par x CV _
+90 par T_17 RET _
+91 call sqr _ _
+92 par x CV _
+93 par T_18 RET _
+94 call sqr _ _
+95 * sqr sqr T_19
+96 := T_19 _ y
+97 ret y _ _
+98 halt _ _ _
+99 end_block quad _ _
+100 glob counterFunctionCalls _ _
+101 begin_block leap _ _
+102 + counterFunctionCalls 1 T_20
+103 := T_20 _ counterFunctionCalls
+104 % year 4 T_21
+105 == T_21 0 107
+106 jump _ _ 110
+107 % year 100 T_22
+108 != T_22 0 113
+109 jump _ _ 110
+110 % year 400 T_23
+111 == T_23 0 113
+112 jump _ _ 115
+113 ret 1 _ _
+114 jump _ _ 116
+115 ret 0 _ _
+116 halt _ _ _
+117 end_block leap _ _
+118 begin_block main _ _
+119 := 0 _ counterFunctionCalls
+120 inp i _ _
+121 out i _ _
+122 := 1600 _ i
+123 <= i 2000 126
+124 jump _ _ 133
+125 jump _ _ 123
+126 par i CV _
+127 par T_24 RET _
+128 call leap _ _
+129 out leap _ _
+130 + i 400 T_25
+131 := T_25 _ i
+132 jump _ _ 123
+133 par 2023 CV _
+134 par T_26 RET _
+135 call leap _ _
+136 out leap _ _
+137 par 2024 CV _
+138 par T_27 RET _
+139 call leap _ _
+140 out leap _ _
+141 par 3 CV _
+142 par T_28 RET _
+143 call quad _ _
+144 out quad _ _
+145 par 5 CV _
+146 par T_29 RET _
+147 call fib _ _
+148 out fib _ _
+149 := 1 _ i
+150 <= i 12 153
+151 jump _ _ 160
+152 jump _ _ 150
+153 par i CV _
+154 par T_30 RET _
+155 call isPrime _ _
+156 out isPrime _ _
+157 + i 1 T_31
+158 := T_31 _ i
+159 jump _ _ 150
+160 out counterFunctionCalls _ _
+161 halt _ _ _
+162 end_block main _ _
