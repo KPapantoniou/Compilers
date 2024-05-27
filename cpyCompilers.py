@@ -19,6 +19,7 @@ quadrupleList = []
 lineCount =0
 line_final = 0
 tempVariableCount =0 
+
 isFunction = False
 class Token:
     def __init__(self, token, tokenType):
@@ -428,9 +429,6 @@ class SyntaxAnalyzer:
             Quadruple.genquad("end_block",programName,'_','_')
             self.symbol_table.exit_scope()
             if self.tokenCheck('#}'):
-                # Quadruple.genquad("halt",'_','_','_')
-                # Quadruple.functionFormat("halt",'_','_','_')
-                # Quadruple.functionFormat("end_block",programName,'_','_')
                 return True
 
     def declarations(self):
@@ -560,11 +558,7 @@ class SyntaxAnalyzer:
         cond_true,cond_false = self.condition()
         self.tokenCheck(':')
         Quadruple.backpatch(cond_true,Quadruple.nextquad())
-        # print(self.currentToken.token,'oooooooo')
-        # self.code_block()
         self.statements()
-        # while_statment = Quadruple.makelist(Quadruple.nextquad())
-        # print(self.currentToken.token,'AAAAAAAA')
         Quadruple.genquad('jump','_','_',quad)
         Quadruple.backpatch(cond_false,Quadruple.nextquad())
         
@@ -572,11 +566,9 @@ class SyntaxAnalyzer:
             self.tokenCheck('#{')
             Quadruple.backpatch(cond_true,Quadruple.nextquad())
             self.code_block()
-            # self.statements()
             Quadruple.genquad('jump','_','_',quad)
             Quadruple.backpatch(cond_false,Quadruple.nextquad())
             self.tokenCheck('#}')
-        # Quadruple.backpatch(while_statment,Quadruple.nextquad())
 
     def return_statements(self):
         self.tokenCheck('return')
@@ -590,7 +582,6 @@ class SyntaxAnalyzer:
         expression = self.expression()
         self.tokenCheck(')')
         Quadruple.genquad('out',expression,'_','_')
-        # Quadruple.functionFormat('out',expression,'_','_')
 
     def input_statements(self, id):
         self.tokenCheck('int')
@@ -612,24 +603,18 @@ class SyntaxAnalyzer:
         z =''
         while self.currentToken.token == 'or':            
             self.tokenCheck('or')
-            # bool_terms.append(self.bool_term())
             if cond_false:
                 Quadruple.backpatch(cond_false,Quadruple.nextquad())
             bool_term2 = self.bool_term()
 
             cond_true = Quadruple.mergelist(cond_true,bool_term2[0])
-            # print(f"Here: {cond_true}")
             cond_false = bool_term2[1]
-            # z= Quadruple.nextquad()
-            # Quadruple.genquad("or",bool_terms[0],bool_terms[1],z)
-        # print(cond_true)
         return cond_true,cond_false
     
     def bool_term(self):
         B_true = []
         B_false = []
         B_true,B_false =self.bool_factor()
-        # print(f"Here the rsult of bool_factor: {res}\n")
         while self.currentToken.token == 'and':
             self.tokenCheck('and')
             Quadruple.backpatch(B_true,Quadruple.nextquad())
@@ -645,8 +630,6 @@ class SyntaxAnalyzer:
         if self.currentToken.token == 'not':
             self.tokenCheck('not')
             condition = self.condition()
-            # result = Quadruple.nextquad()
-            # Quadruple.genquad("!", self.currentToken.token, '_', result)
             B_true = condition[0]
             B_false = condition[1]
         elif self.currentToken.token == '(':
@@ -665,7 +648,6 @@ class SyntaxAnalyzer:
                 ex2 = self.expression()
                 # result = Quadruple.nextquad()
                 B_true = Quadruple.makelist(Quadruple.nextquad())
-                # Quadruple.genquad(op, first_part, second_part,'_')
                 Quadruple.genquad(op, ex1, ex2,'_')
                 jump_target = Quadruple.nextquad()
                 B_false = Quadruple.makelist(Quadruple.nextquad())
@@ -738,7 +720,6 @@ class SyntaxAnalyzer:
             z = Quadruple.newtemp()
             self.symbol_table.insert(TemporaryVariable(z, 'integer', None))
             Quadruple.genquad(operator,res,res2,z)
-            # Quadruple.functionFormat(operator,res,res2,z)
             res= z
         temp = res
         # print(temp,"term")
@@ -811,7 +792,11 @@ class Quadruple:
         self.z = str(z)
         
     def __str__(self):
-        return f"({self.operation}, {self.x}, {self.y}, {self.z})"
+        return f"{self.operation}, {self.x}, {self.y}, {self.z}"
+    
+    def to_list(self):
+        return [self.operation, self.x, self.y, self.z]
+
     
     @staticmethod
     def functionFormat(operation, x, y, z):
@@ -820,20 +805,14 @@ class Quadruple:
         lineCount += 1
     @classmethod
     def nextquad(cls):
-
         global lineCount
-        # lineCount += 1
-        
         return lineCount
 
 
     def genquad(operation, x, y, z):
         global quadrupleList, lineCount
-        # self.id += 1
         lineCount +=1
         newQuad = Quadruple(operation, x, y, z)
-        # newQuad.nextquad()
-        # print(newQuad)
         quadrupleList.append(newQuad)
 
     def emptylist():
@@ -858,17 +837,13 @@ class Quadruple:
         newList.append(x)
         return newList
 
-    # def backpatch(list,z):
-    #     for quadruple in quadrupleList:
-    #         if quadruple in list:
-    #             quadruple[-1] = str(z)
 
     def backpatch(list,z):
         global quadrupleList
         for quad in quadrupleList:
             if quad.id in list:
-                # print("Found!")
                 quad.z = str(z)
+
 
 
 ##------------------------------------ Symbol Table ------------------------------------##
@@ -930,7 +905,7 @@ class Procedure(Entity):
         self.formalParameters = []
 
     def __str__(self):
-        return f'Proc: name: {self.name} startingQuad: {self.starting_quad} framelen: {self.frame_length}'
+        return f'Proc: name: {self.name} startingQuad: {self.starting_quad} framelen: {self.frame_length} number of parameters: {len(self.formalParameters)}'
 
 
 class Function(Procedure):
@@ -939,7 +914,7 @@ class Function(Procedure):
         self.type = type
 
     def __str__(self):
-        return f'Func: name: {self.name} startquad:{self.starting_quad} framelen:{self.frame_length}'
+        return f'Func: name: {self.name} startquad:{self.starting_quad} framelen:{self.frame_length} number of parameters: {len(self.formalParameters)}'
 
 
 class SymbolTable:
@@ -949,10 +924,9 @@ class SymbolTable:
         self.current_scope = None
         self.current_stack = -1
         self.function_scopes = {}
-        self.outputFile = "symbolTable.txt"
+        self.outputFile = "symbolTable.sym"
         self.fd = open(self.outputFile, "w")
         
-
     def __str__(self):
         string = ''
         for scope in self.scopes:
@@ -973,7 +947,6 @@ class SymbolTable:
              self.fd.write(f'scope:{self.scopes.index(scope)}\n')
              for entity in scope:
                 self.fd.write(f'\t{entity}\n')
-        # self.fd.close()
 
     def exit_scope(self):
         global quadrupleList,quad_file
@@ -1001,13 +974,13 @@ class SymbolTable:
 
     def insert(self, entity):
         if entity.__class__.__name__ == 'Parameter' or entity.__class__.__name__ == 'Variable' or entity.__class__.__name__ == 'TemporaryVariable':
-            # print(self.current_stack)
             entity.offset = self.stack_position[self.current_stack]
             self.stack_position[self.current_stack] += 4 ##here
         self.current_scope.append(entity)
 
     def varlookup(self, name):
         scopeNum = 0
+        print(self.scopes)
         for scope in reversed(self.scopes):
             scopeNum += 1
             for entity in scope:
