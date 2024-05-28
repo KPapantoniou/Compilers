@@ -13,14 +13,11 @@ L1:
 	add t1, t1, t2
 	sw t1, -20(sp)
 L2:
-	#before for loadvr
 	lw t1, -20(sp)
-	#here for loadvr
 	lw t0, -4(sp)
 	lw t0, -4(t0)
 	addi t0, t0, -16
 	sw t1, 0(t0)
-	#here for storevr
 L3:
 	lw t0, -4(sp)
 	lw t0, -4(t0)
@@ -33,11 +30,8 @@ L3:
 	add t1, t1, t2
 	sw t1, -24(sp)
 L4:
-	#before for loadvr
 	lw t1, -24(sp)
-	#here for loadvr
 	sw t1, -16(sp)
-	#here for storevr
 L5:
 	lw a0, -16(sp)
 	li a7, 1
@@ -71,7 +65,7 @@ L8:
 L9:
 L10:
 L11:
-	addi fp, sp, -28
+	addi fp, sp, 28
 	lw t0, -12(sp)
 	sw t0, -12(fp)
 L12:
@@ -85,10 +79,8 @@ L13:
 	addi sp, sp, 28
 L14:
 L15:
-	#before for loadvr
-	#here for loadvr
+	lw t1, -12(sp)
 	sw t1, -16(sp)
-	#here for storevr
 L16:
 	lw a0, -16(sp)
 	li a7, 1

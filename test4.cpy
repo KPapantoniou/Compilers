@@ -3,7 +3,7 @@
 def func(a):
 #{ 
     #int c
-    global b
+    global b 
     c = a + 1
     b = c + a
     print(b)
