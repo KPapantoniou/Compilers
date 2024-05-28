@@ -5,7 +5,6 @@
 ##test variable scope of the cpy language##
 
 
-#int var1, var2
     
 def func1():
 #{

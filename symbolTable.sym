@@ -1,7 +1,7 @@
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: counterFunctionCalls, offset: 12
-	Func: name: max3 startquad:0 framelen:32 number of parameters: 3
+	Func: name: max3 startquad:1 framelen:32 number of parameters: 3
 scope:1
 	Param: name: x, mode: in offset: 12
 	Param: name: y, mode: in offset: 16
@@ -11,8 +11,8 @@ scope:1
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: counterFunctionCalls, offset: 12
-	Func: name: max3 startquad:0 framelen:32 number of parameters: 3
-	Func: name: fib startquad:17 framelen:40 number of parameters: 1
+	Func: name: max3 startquad:1 framelen:32 number of parameters: 3
+	Func: name: fib startquad:19 framelen:40 number of parameters: 1
 scope:1
 	Param: name: x, mode: in offset: 12
 	TempVar: name: T_2, offset: 16
@@ -24,13 +24,13 @@ scope:1
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: counterFunctionCalls, offset: 12
-	Func: name: max3 startquad:0 framelen:32 number of parameters: 3
-	Func: name: fib startquad:17 framelen:40 number of parameters: 1
+	Func: name: max3 startquad:1 framelen:32 number of parameters: 3
+	Func: name: fib startquad:19 framelen:40 number of parameters: 1
 	Func: name: isPrime startquad:None framelen:None number of parameters: 1
 scope:1
 	Param: name: x, mode: in offset: 12
 	Variable: name: i, offset: 16
-	Func: name: divides startquad:40 framelen:32 number of parameters: 2
+	Func: name: divides startquad:43 framelen:32 number of parameters: 2
 scope:2
 	Param: name: x, mode: in offset: 12
 	Param: name: y, mode: in offset: 16
@@ -40,27 +40,27 @@ scope:2
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: counterFunctionCalls, offset: 12
-	Func: name: max3 startquad:0 framelen:32 number of parameters: 3
-	Func: name: fib startquad:17 framelen:40 number of parameters: 1
-	Func: name: isPrime startquad:51 framelen:32 number of parameters: 1
+	Func: name: max3 startquad:1 framelen:32 number of parameters: 3
+	Func: name: fib startquad:19 framelen:40 number of parameters: 1
+	Func: name: isPrime startquad:54 framelen:32 number of parameters: 1
 scope:1
 	Param: name: x, mode: in offset: 12
 	Variable: name: i, offset: 16
-	Func: name: divides startquad:40 framelen:32 number of parameters: 2
+	Func: name: divides startquad:43 framelen:32 number of parameters: 2
 	TempVar: name: T_11, offset: 20
 	TempVar: name: T_12, offset: 24
 	TempVar: name: T_13, offset: 28
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: counterFunctionCalls, offset: 12
-	Func: name: max3 startquad:0 framelen:32 number of parameters: 3
-	Func: name: fib startquad:17 framelen:40 number of parameters: 1
-	Func: name: isPrime startquad:51 framelen:32 number of parameters: 1
+	Func: name: max3 startquad:1 framelen:32 number of parameters: 3
+	Func: name: fib startquad:19 framelen:40 number of parameters: 1
+	Func: name: isPrime startquad:54 framelen:32 number of parameters: 1
 	Func: name: quad startquad:None framelen:None number of parameters: 1
 scope:1
 	Param: name: x, mode: in offset: 12
 	Variable: name: y, offset: 16
-	Func: name: sqr startquad:71 framelen:24 number of parameters: 1
+	Func: name: sqr startquad:75 framelen:24 number of parameters: 1
 scope:2
 	Param: name: x, mode: in offset: 12
 	TempVar: name: T_14, offset: 16
@@ -68,14 +68,14 @@ scope:2
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: counterFunctionCalls, offset: 12
-	Func: name: max3 startquad:0 framelen:32 number of parameters: 3
-	Func: name: fib startquad:17 framelen:40 number of parameters: 1
-	Func: name: isPrime startquad:51 framelen:32 number of parameters: 1
-	Func: name: quad startquad:77 framelen:36 number of parameters: 1
+	Func: name: max3 startquad:1 framelen:32 number of parameters: 3
+	Func: name: fib startquad:19 framelen:40 number of parameters: 1
+	Func: name: isPrime startquad:54 framelen:32 number of parameters: 1
+	Func: name: quad startquad:81 framelen:36 number of parameters: 1
 scope:1
 	Param: name: x, mode: in offset: 12
 	Variable: name: y, offset: 16
-	Func: name: sqr startquad:71 framelen:24 number of parameters: 1
+	Func: name: sqr startquad:75 framelen:24 number of parameters: 1
 	TempVar: name: T_16, offset: 20
 	TempVar: name: T_17, offset: 24
 	TempVar: name: T_18, offset: 28
@@ -83,11 +83,11 @@ scope:1
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: counterFunctionCalls, offset: 12
-	Func: name: max3 startquad:0 framelen:32 number of parameters: 3
-	Func: name: fib startquad:17 framelen:40 number of parameters: 1
-	Func: name: isPrime startquad:51 framelen:32 number of parameters: 1
-	Func: name: quad startquad:77 framelen:36 number of parameters: 1
-	Func: name: leap startquad:90 framelen:32 number of parameters: 1
+	Func: name: max3 startquad:1 framelen:32 number of parameters: 3
+	Func: name: fib startquad:19 framelen:40 number of parameters: 1
+	Func: name: isPrime startquad:54 framelen:32 number of parameters: 1
+	Func: name: quad startquad:81 framelen:36 number of parameters: 1
+	Func: name: leap startquad:95 framelen:32 number of parameters: 1
 scope:1
 	Param: name: year, mode: in offset: 12
 	TempVar: name: T_20, offset: 16
@@ -97,12 +97,12 @@ scope:1
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: counterFunctionCalls, offset: 12
-	Func: name: max3 startquad:0 framelen:32 number of parameters: 3
-	Func: name: fib startquad:17 framelen:40 number of parameters: 1
-	Func: name: isPrime startquad:51 framelen:32 number of parameters: 1
-	Func: name: quad startquad:77 framelen:36 number of parameters: 1
-	Func: name: leap startquad:90 framelen:32 number of parameters: 1
-	Proc: name: main startingQuad: 106 framelen: 52 number of parameters: 0
+	Func: name: max3 startquad:1 framelen:32 number of parameters: 3
+	Func: name: fib startquad:19 framelen:40 number of parameters: 1
+	Func: name: isPrime startquad:54 framelen:32 number of parameters: 1
+	Func: name: quad startquad:81 framelen:36 number of parameters: 1
+	Func: name: leap startquad:95 framelen:32 number of parameters: 1
+	Proc: name: main startingQuad: 111 framelen: 48 number of parameters: 0
 scope:1
 	Variable: name: i, offset: 12
 	TempVar: name: T_24, offset: 16
@@ -113,4 +113,3 @@ scope:1
 	TempVar: name: T_29, offset: 36
 	TempVar: name: T_30, offset: 40
 	TempVar: name: T_31, offset: 44
-	TempVar: name: T_32, offset: 48

@@ -11,7 +11,7 @@ def func(a):
 #}
 
 #def main
-a = 1
+a = int(input())
 b = func(a)
 print(b)
 
