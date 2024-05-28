@@ -1,10 +1,4 @@
-##Authors: 1. Konstantinos Papantoniou-Xatzigiosis, AM: 4769
-#         2. Natalia Michou                      , AM: 4922
-# Date: 2024-03-25##
-
-##Test to check arithmetic operations##
-
-#int a
+a = 10
 
 def add(b):
 
@@ -57,16 +51,17 @@ def gcd(b):
         a = t
     return a
 
+def main():
+    x = 4
+    
+    gcdre = gcd(x)
 
-x = 4
-a = 10
-gcdre = gcd(x)
+    print(add(x),"addition")
+    print(subtract(x),"subtraction")
+    print(multiply(x),"multiplication")
+    print(divide(x),"division")
+    print(modOp(x), "modulus")
+    print(power(x),"power")
+    print(gcdre,"gcd")
 
-print(add(x))
-print(subtract(x))
-print(multiply(x))
-print(divide(x))
-print(modOp(x))
-print(power(x))
-print(gcdre)
-
+main()

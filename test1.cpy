@@ -6,20 +6,20 @@
 
 #int a
 
-def add(b):
+def modOp(b):
 #{
     #int result
     global a
-    result = a+b
+    result = a%b
     return result
 #}
 
-
 #def main
-#int x
+#int x,y
 
 x = 4
 a = 10
-y = add(x)
+y = modOp(x)
 
 print(y)
+

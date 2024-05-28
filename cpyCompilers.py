@@ -11,7 +11,7 @@
 # from sys import argv
 
 # fileName = argv[1] 
-fileName = './test4.cpy'
+fileName = './test1.cpy'
 quad_file = open('quadruples.int', 'w')
 temporaryVariables = []
 quadrupleList = []
@@ -486,14 +486,8 @@ class SyntaxAnalyzer:
             self.input_statements(result)
         else:
             expression = self.expression()
-            
-            if isFunction and temporaryVariables:
-                Quadruple.genquad(':=',temporaryVariables[-1],'_',result)
-                isFunction = False
-            else:
-                Quadruple.genquad(':=',expression,'_',result)
-            
-            # isFunction = False
+            Quadruple.genquad(':=',expression,'_',result)
+            isFunction = False
             
 
     def other_statements(self, result):
@@ -1027,9 +1021,9 @@ class FinalCode:
     def gnvlcode(self, v):
             scope_number, entity = self.symbol_table.varlookup(v)
             scope_level = len(self.symbol_table.scopes)
-            steps = scope_level - scope_number
+            steps = scope_level - scope_number 
             self.final_codef.write("\tlw t0, -4(sp)\n")
-            while steps > 0:
+            while steps > 1:
                 self.final_codef.write("\tlw t0, -4(t0)\n")
                 steps -= 1
             self.final_codef.write(f"\taddi t0, t0, -{entity.offset}\n")
@@ -1039,24 +1033,21 @@ class FinalCode:
             self.final_codef.write(f"\tli {r}, {v}\n")
         else:
             scope_number, entity = self.symbol_table.varlookup(v)
-            current_scope_level = len(self.symbol_table.scopes)
+            current_scope_level = len(self.symbol_table.scopes) 
             if isinstance(entity, Variable) and scope_number == 0:
                 self.final_codef.write(f"\tlw {r}, -{entity.offset}(fp)\n")
             elif isinstance(entity, Variable) and scope_number == current_scope_level:
                 self.final_codef.write(f"\tlw {r}, -{entity.offset}(sp)\n")
-            elif (isinstance(entity, Parameter)and entity.mode =='in' )and scope_number == current_scope_level:
+            elif isinstance(entity, Parameter) and scope_number == current_scope_level:
                 self.final_codef.write(f"\tlw {r}, -{entity.offset}(sp)\n")
             elif isinstance(entity, TemporaryVariable) and scope_number:
                 self.final_codef.write(f"\tlw {r}, -{entity.offset}(sp)\n")
             elif isinstance(entity, Variable) and scope_number < current_scope_level:
                 self.gnvlcode(v)
                 self.final_codef.write(f"\tlw {r}, 0(t0)\n")
-            elif (isinstance(entity,Parameter) and entity.mode == 'in') and scope_number < current_scope_level:
+            elif isinstance(entity,Parameter) and scope_number < current_scope_level:
                 self.gnvlcode(v)
                 self.final_codef.write(f"\tlw {r}, 0(t0)\n")
-            else:
-                print("Error: Loadvr with v: ", v, " r: ", r)
-                
 
 
     def storerv(self, r, v):
@@ -1070,19 +1061,16 @@ class FinalCode:
                 self.final_codef.write(f"\tsw {r}, -{entity.offset}(fp)\n")
             elif isinstance(entity, Variable) and scope_number == current_scope_level:
                 self.final_codef.write(f"\tsw {r}, -{entity.offset}(sp)\n")
-            elif (isinstance(entity, Parameter) and entity.mode == 'in') and  scope_number == current_scope_level:
+            elif isinstance(entity, Parameter) and scope_number == current_scope_level:
                 self.final_codef.write(f"\tsw {r}, -{entity.offset}(sp)\n")
-
             elif isinstance(entity, TemporaryVariable):
                 self.final_codef.write(f"\tsw {r}, -{entity.offset}(sp)\n")
             elif isinstance(entity, Variable) and scope_number < current_scope_level:
                 self.gnvlcode(v)
                 self.final_codef.write(f"\tsw {r}, 0(t0)\n")
-            elif (isinstance(entity,Parameter) and entity.mode == 'in') and scope_number < current_scope_level:
+            elif isinstance(entity, Parameter) and scope_number < current_scope_level:
                 self.gnvlcode(v)
                 self.final_codef.write(f"\tsw {r}, 0(t0)\n")
-            else:
-                print("Error: Storerv with v: ", v, " r: ", r)
 
 
     def createLabel(self):
@@ -1107,7 +1095,7 @@ class FinalCode:
                 for param in self.paramList:
                     self.createLabel()
                     if self.paramList.index(param) == 0:
-                        self.final_codef.write(f"\taddi fp, sp, {frame_length}\n")
+                        self.final_codef.write(f"\taddi fp, sp, -{frame_length}\n")
                     if param.y == 'CV':
                         d = 12+4*(self.paramList.index(param))
                         self.loadvr(param.x, 't0')
@@ -1121,8 +1109,8 @@ class FinalCode:
                 scope, entity = self.symbol_table.varlookup(quad.x)
                 starting_quad, frame_length, formal_parameters = self.symbol_table.funclookup(quad.x)
                 current_scope_level = len(self.symbol_table.scopes)
-                called_scope_level = current_scope_level - scope
-                if current_scope_level == scope:
+                called_scope_level = current_scope_level - scope -1
+                if current_scope_level == called_scope_level:
                     self.final_codef.write("\tlw t0, -4(sp)\n")
                     self.final_codef.write("\tsw t0, -4(fp)\n")
                 else:
@@ -1134,11 +1122,8 @@ class FinalCode:
             
 
             self.createLabel()
-            if quad.operation == 'glob':
-                print("Global")
-                offset = self.symbol_table.stack_position[self.symbol_table.current_stack]
-                self.final_codef.write(f"\tlw reg, -{offset}(gp)\n")
-            elif quad.operation == ":=":
+            if quad.operation == ":=":
+                # print(quad.x)
                 self.loadvr(quad.x, 't1')
                 self.storerv('t1', quad.z)
             elif quad.operation == '+':
@@ -1212,7 +1197,7 @@ class FinalCode:
                 self.final_codef.write("\tsw t1, 0(t0)\n")
                 self.final_codef.write("\tlw ra, (sp)\n")
                 frame_length = self.symbol_table.get_last_frame_length()
-                self.final_codef.write(f"\taddi sp, sp, {frame_length}\n")
+                # self.final_codef.write(f"\taddi sp, sp, {frame_length}\n")
                 self.final_codef.write("\tjr ra\n")
             elif quad.operation == 'halt':
                 self.final_codef.write("\tli a0, 0\n")
@@ -1237,3 +1222,4 @@ lex = LexicalAnalyzer(fileName)
 tokens = lex.lexical_analyzer()
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
+

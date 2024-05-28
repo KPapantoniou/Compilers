@@ -1,18 +1,17 @@
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: a, offset: 12
-	Variable: name: b, offset: 16
-	Func: name: func startquad:0 framelen:28
+	Func: name: modOp startquad:0 framelen:24
 scope:1
-	Param: name: a, mode: in offset: 12
-	Variable: name: c, offset: 16
+	Param: name: b, mode: in offset: 12
+	Variable: name: result, offset: 16
 	TempVar: name: T_1, offset: 20
-	TempVar: name: T_2, offset: 24
 Exiting a scope, printing current state of Symbol table
 scope:0
 	Variable: name: a, offset: 12
-	Variable: name: b, offset: 16
-	Func: name: func startquad:0 framelen:28
-	Proc: name: main startingQuad: 8 framelen: 16
+	Func: name: modOp startquad:0 framelen:24
+	Proc: name: main startingQuad: 5 framelen: 24
 scope:1
-	TempVar: name: T_3, offset: 12
+	Variable: name: x, offset: 12
+	Variable: name: y, offset: 16
+	TempVar: name: T_2, offset: 20
