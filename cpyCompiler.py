@@ -1,6 +1,6 @@
 #Authors: 1. Konstantinos Papantoniou-Xatzigiosis, AM: 4769
 #         2. Natalia Michou                      , AM: 4922
-# Date: 2024-03-25
+# Date: 2024-05-29
 # Description: A compiler for the cpy language,
 # including a lexical analyzer, a syntax analyzer,
 #  an intermediate code generator and a symbol table. 
@@ -8,10 +8,9 @@
 
 
 
-# from sys import argv
+from sys import argv
 
-# fileName = argv[1] 
-fileName = './test1.cpy'
+fileName = argv[1] 
 quad_file = open('quadruples.int', 'w')
 temporaryVariables = []
 quadrupleList = []
@@ -46,9 +45,7 @@ class LexicalAnalyzer:
         'stateERROR': -1,
         'stateOK': -2,
         'stateEOF': -3
-    
        }
-
 
     def lexical_analyzer(self):
         file = open(self.filename, 'r')
@@ -286,8 +283,6 @@ class LexicalAnalyzer:
                     print('Line: %d:%d'%(line,col))
                     state = self.STATES['stateERROR']
 
-       
-        
             if state == self.STATES['stateEOF']:
                 state = self.STATES['stateOK']
                 token += 'EOF'
@@ -356,7 +351,6 @@ class SyntaxAnalyzer:
         else:
             raise Exception(f"Syntax error: expected '{expectedToken}' received '{self.currentToken.token}' token number '{self.tokenIndex}'")
             
-
     def startRule(self):
         if self.currentToken.token == '#int':
             self.tokenCheck('#int')
@@ -366,6 +360,8 @@ class SyntaxAnalyzer:
             self.startRule()
         elif self.currentToken.token == 'def':
             self.tokenCheck('def')
+            if self.symbol_table.current_scope == None:
+                self.symbol_table.enter_scope()
             if self.def_function():
                 self.startRule()
         elif self.currentToken.token == '#def':
@@ -392,7 +388,7 @@ class SyntaxAnalyzer:
         self.symbol_table.update(mainfunc, frame_length=self.symbol_table.stack_position[self.symbol_table.current_stack])
         Quadruple.genquad("end_block",'main','_','_')
         endBlock = Quadruple.endBlock(quadrupleList)
-        self.final_code.final_code(Quadruple.blockLength(beginBlock, endBlock, quadrupleList), self.symbol_table)
+        self.final_code.final_code(Quadruple.blockLength(beginBlock, endBlock, quadrupleList))
         self.final_code.final_codef.close()
         self.symbol_table.exit_scope()
         if self.currentToken.token == 'EOF':
@@ -412,8 +408,7 @@ class SyntaxAnalyzer:
                 self.symbol_table.insert(Parameter(param, 'integer', 'in', None))
             self.tokenCheck(')')
             self.tokenCheck(':')
-            self.tokenCheck('#{')
-                            
+            self.tokenCheck('#{')               
             while self.currentToken.token == '#int':
                 self.tokenCheck('#int')
                 self.declarations()
@@ -428,7 +423,6 @@ class SyntaxAnalyzer:
             while self.currentToken.token == 'def':
                 self.nextToken()
                 self.def_function()
-
             self.symbol_table.update(func, starting_quad=Quadruple.nextquad()) 
             Quadruple.genquad("begin_block",programName,'_','_')
             beginBlock = Quadruple.beginBlock(quadrupleList)      
@@ -436,7 +430,7 @@ class SyntaxAnalyzer:
             self.symbol_table.update(func, frame_length=self.symbol_table.stack_position[self.symbol_table.current_stack])
             Quadruple.genquad("end_block",programName,'_','_')
             endBlock = Quadruple.endBlock(quadrupleList)
-            self.final_code.final_code(Quadruple.blockLength(beginBlock, endBlock, quadrupleList), self.symbol_table)
+            self.final_code.final_code(Quadruple.blockLength(beginBlock, endBlock, quadrupleList))
             self.symbol_table.exit_scope()
             if self.tokenCheck('#}'):
                 return True
@@ -488,7 +482,6 @@ class SyntaxAnalyzer:
             expression = self.expression()
             Quadruple.genquad(':=',expression,'_',result)
             isFunction = False
-            
 
     def other_statements(self, result):
         if self.currentToken.token == 'if':
@@ -508,15 +501,12 @@ class SyntaxAnalyzer:
         cond_result = self.condition()     
         self.tokenCheck(':')
         Quadruple.backpatch(cond_result[0],Quadruple.nextquad())
-        # self.code_block()
         stet =self.statements()
-        # print(stet)
         if_statment = Quadruple.makelist(Quadruple.nextquad())
         Quadruple.genquad('jump','_','_','_')
         Quadruple.backpatch(cond_result[1],Quadruple.nextquad())
         if self.currentToken.token == '#{':
             self.tokenCheck('#{')
-            # self.code_block()
             Quadruple.backpatch(cond_result[0],Quadruple.nextquad())
             self.code_block()
             if_statment = Quadruple.makelist(Quadruple.nextquad())
@@ -573,8 +563,6 @@ class SyntaxAnalyzer:
             Quadruple.genquad('jump','_','_',quad)
             Quadruple.backpatch(cond_false,Quadruple.nextquad())
         
-        
-
 
     def return_statements(self):
         self.tokenCheck('return')
@@ -605,13 +593,11 @@ class SyntaxAnalyzer:
         cond_true = []
         cond_false = []
         cond_true,cond_false = self.bool_term()
-        z =''
         while self.currentToken.token == 'or':            
             self.tokenCheck('or')
             if cond_false:
                 Quadruple.backpatch(cond_false,Quadruple.nextquad())
             bool_term2 = self.bool_term()
-
             cond_true = Quadruple.mergelist(cond_true,bool_term2[0])
             cond_false = bool_term2[1]
         return cond_true,cond_false
@@ -624,7 +610,6 @@ class SyntaxAnalyzer:
             self.tokenCheck('and')
             Quadruple.backpatch(B_true,Quadruple.nextquad())
             bool_factor =  self.bool_factor()
-
             B_false= Quadruple.mergelist(B_false,bool_factor[1])
             B_true = bool_factor[0]
         return B_true,B_false
@@ -644,25 +629,21 @@ class SyntaxAnalyzer:
             B_true = condition[0]
             B_false = condition[1]
         else:
-            first_part = self.currentToken.token
             ex1 = self.expression()
             if self.currentToken.token in ['<', '>', '==', '!=', '<=', '>=']:
                 op = self.currentToken.token
                 self.nextToken()
-                second_part = self.currentToken.token
                 ex2 = self.expression()
                 B_true = Quadruple.makelist(Quadruple.nextquad())
                 Quadruple.genquad(op, ex1, ex2,'_')
                 jump_target = Quadruple.nextquad()
                 B_false = Quadruple.makelist(Quadruple.nextquad())
                 Quadruple.genquad('jump','_','_','_')
-                
-            
         return B_true,B_false
 
 
     def expression(self):
-        new_temp = ''
+        z = ''
         first_place = ''
         if self.currentToken.token in ['if','elif','else','while','print','return','input']:
             self.statements()
@@ -670,7 +651,6 @@ class SyntaxAnalyzer:
                 self.expression()
         elif self.currentToken.token =='#}':
             self.tokenCheck('#}')
-        
         else:
             sign =self.optional_sign()
             res = self.term()
@@ -685,15 +665,12 @@ class SyntaxAnalyzer:
                 else:
                     operator = self.currentToken.token
                     self.tokenCheck('-')
-                
                 second_place = self.term()
                 z = Quadruple.newtemp()
                 self.symbol_table.insert(TemporaryVariable(z, 'integer', None))
                 Quadruple.genquad(operator, first_place, second_place,z)
                 first_place = z
         return  first_place
-    
-    
     
     def optional_sign(self):
         sign = ''
@@ -703,7 +680,6 @@ class SyntaxAnalyzer:
         elif self.currentToken.token == '-':
             sign = self.currentToken.token
             self.tokenCheck('-')
-        
         return sign
 
     def term(self):
@@ -755,7 +731,6 @@ class SyntaxAnalyzer:
             self.symbol_table.insert(TemporaryVariable(new_temp, 'integer', None))
             Quadruple.genquad('par',new_temp,'RET','_')
             Quadruple.genquad('call',name,'_','_')
-
         return res
     
     def actual_pars(self):
@@ -925,9 +900,8 @@ class SymbolTable:
         self.current_scope = None
         self.current_stack = -1
         self.function_scopes = {}
-        self.outputFile = "symbolTable.txt"
+        self.outputFile = "symbolTable.sym"
         self.fd = open(self.outputFile, "w")
-        
 
     def __str__(self):
         string = ''
@@ -1020,12 +994,13 @@ class FinalCode:
 
     def gnvlcode(self, v):
             scope_number, entity = self.symbol_table.varlookup(v)
-            scope_level = len(self.symbol_table.scopes)
-            steps = scope_level - scope_number 
-            self.final_codef.write("\tlw t0, -4(sp)\n")
-            while steps > 1:
-                self.final_codef.write("\tlw t0, -4(t0)\n")
-                steps -= 1
+            if scope_number == 1:
+                return
+            for i in range(scope_number-1):
+                if i == 0:
+                    self.final_codef.write("\tlw t0, -4(sp)\n")
+                else:
+                    self.final_codef.write("\tlw t0, -4(t0)\n")
             self.final_codef.write(f"\taddi t0, t0, -{entity.offset}\n")
             
     def loadvr(self, v, r):
@@ -1033,60 +1008,40 @@ class FinalCode:
             self.final_codef.write(f"\tli {r}, {v}\n")
         else:
             scope_number, entity = self.symbol_table.varlookup(v)
-            current_scope_level = len(self.symbol_table.scopes) 
-            if isinstance(entity, Variable) and scope_number == 0:
-                self.final_codef.write(f"\tlw {r}, -{entity.offset}(fp)\n")
-            elif isinstance(entity, Variable) and scope_number == current_scope_level:
+            if scope_number and (isinstance(entity, Variable) or isinstance(entity, TemporaryVariable) or isinstance(entity, Parameter))  == 1:
                 self.final_codef.write(f"\tlw {r}, -{entity.offset}(sp)\n")
-            elif isinstance(entity, Parameter) and scope_number == current_scope_level:
-                self.final_codef.write(f"\tlw {r}, -{entity.offset}(sp)\n")
-            elif isinstance(entity, TemporaryVariable) and scope_number:
-                self.final_codef.write(f"\tlw {r}, -{entity.offset}(sp)\n")
-            elif isinstance(entity, Variable) and scope_number < current_scope_level:
+            elif scope_number > 1 and (isinstance(entity, Variable) or isinstance(entity, TemporaryVariable) or isinstance(entity, Parameter)):
                 self.gnvlcode(v)
-                self.final_codef.write(f"\tlw {r}, 0(t0)\n")
-            elif isinstance(entity,Parameter) and scope_number < current_scope_level:
-                self.gnvlcode(v)
-                self.final_codef.write(f"\tlw {r}, 0(t0)\n")
-
+                self.final_codef.write(f"\tlw {r}, (t0)\n")
+            elif scope_number == len(self.symbol_table.scopes) and isinstance(entity, Variable):
+                self.final_codef.write(f"\tlw {r}, -{entity.offset}(gp)\n")
 
     def storerv(self, r, v):
         if v.lstrip('-').isdigit(): 
             self.loadvr(r, 't0')
             self.storerv('t0', v)
-        else:
-            scope_number, entity = self.symbol_table.varlookup(v)
-            current_scope_level = len(self.symbol_table.scopes)
-            if isinstance(entity, Variable) and scope_number == 0:
-                self.final_codef.write(f"\tsw {r}, -{entity.offset}(fp)\n")
-            elif isinstance(entity, Variable) and scope_number == current_scope_level:
-                self.final_codef.write(f"\tsw {r}, -{entity.offset}(sp)\n")
-            elif isinstance(entity, Parameter) and scope_number == current_scope_level:
-                self.final_codef.write(f"\tsw {r}, -{entity.offset}(sp)\n")
-            elif isinstance(entity, TemporaryVariable):
-                self.final_codef.write(f"\tsw {r}, -{entity.offset}(sp)\n")
-            elif isinstance(entity, Variable) and scope_number < current_scope_level:
-                self.gnvlcode(v)
-                self.final_codef.write(f"\tsw {r}, 0(t0)\n")
-            elif isinstance(entity, Parameter) and scope_number < current_scope_level:
-                self.gnvlcode(v)
-                self.final_codef.write(f"\tsw {r}, 0(t0)\n")
-
+        scope_number, entity = self.symbol_table.varlookup(v)
+        if scope_number == 1:
+            self.final_codef.write(f"\tsw {r}, -{entity.offset}(sp)\n")
+        elif scope_number > 1:
+            self.gnvlcode(v)
+            self.final_codef.write(f"\tsw {r}, (t0)\n")
+        elif scope_number == len(self.symbol_table.scopes):
+            self.final_codef.write(f"\tsw {r}, -{entity.offset}(gp)\n")
 
     def createLabel(self):
         self.final_codef.write("L"+str(self.labelCount)+":\n")
         self.labelCount += 1
 
-    def final_code(self, quadruple, symbol_table):
-        self.symbol_table = symbol_table
-        global quadrupleList, line_final
+    def final_code(self, quadruple):
         if quadruple[0].x == 'main':
             self.final_codef.write("Lmain:\n")
-            self.final_codef.write("\taddi sp, sp, -"+str(len(self.symbol_table.scopes)*4)+"\n")
+            starting_quad, frame_length, formal_parameters = self.symbol_table.funclookup('main')
+            self.final_codef.write(f"\taddi sp, sp, -{frame_length}\n")
             self.final_codef.write("\tmv fp, sp\n")
         else:
             self.createLabel()
-            self.final_codef.write("\tsw ra, -0(sp)\n")
+            self.final_codef.write("\tsw ra,(sp)\n")
         for quad in quadruple[1:-1]:
             if quad.operation == 'par':
                 self.paramList.append(quad)
@@ -1104,7 +1059,6 @@ class FinalCode:
                         scope, entity = self.symbol_table.varlookup(param.x)
                         self.final_codef.write(f"\taddi t0, sp, -{entity.offset}\n")
                         self.final_codef.write("\tsw t0, -8(fp)\n")
-
                 self.createLabel()
                 scope, entity = self.symbol_table.varlookup(quad.x)
                 starting_quad, frame_length, formal_parameters = self.symbol_table.funclookup(quad.x)
@@ -1115,6 +1069,7 @@ class FinalCode:
                     self.final_codef.write("\tsw t0, -4(fp)\n")
                 else:
                     self.final_codef.write("\tsw sp, -4(fp)\n")
+                
                 self.final_codef.write(f"\taddi sp, sp, -{frame_length}\n")
                 self.final_codef.write(f"\tjal L{starting_quad}\n")
                 self.final_codef.write(f"\taddi sp, sp, {frame_length}\n")
@@ -1123,7 +1078,6 @@ class FinalCode:
 
             self.createLabel()
             if quad.operation == ":=":
-                # print(quad.x)
                 self.loadvr(quad.x, 't1')
                 self.storerv('t1', quad.z)
             elif quad.operation == '+':
@@ -1148,8 +1102,7 @@ class FinalCode:
                 self.storerv('t1', quad.z)
             elif quad.operation == '%':
                 self.loadvr(quad.x, 't1')   
-                self.loadvr(quad.y, 't2')  
-                # print(quad.x, quad.y, quad.z)                 
+                self.loadvr(quad.y, 't2')                   
                 self.final_codef.write("\trem t1, t1, t2\n")
                 self.storerv('t1', quad.z)
             elif quad.operation == '<':
@@ -1197,14 +1150,13 @@ class FinalCode:
                 self.final_codef.write("\tsw t1, 0(t0)\n")
                 self.final_codef.write("\tlw ra, (sp)\n")
                 frame_length = self.symbol_table.get_last_frame_length()
-                # self.final_codef.write(f"\taddi sp, sp, {frame_length}\n")
+                self.final_codef.write(f"\taddi sp, sp, {frame_length}\n")
                 self.final_codef.write("\tjr ra\n")
             elif quad.operation == 'halt':
                 self.final_codef.write("\tli a0, 0\n")
-                self.final_codef.write("\tli a7, 10\n")
+                self.final_codef.write("\tli a7, 93\n")
                 self.final_codef.write("\tecall\n")
                 return
-            
             
         self.createLabel()
         if quadruple[0].x == 'main':
@@ -1222,4 +1174,3 @@ lex = LexicalAnalyzer(fileName)
 tokens = lex.lexical_analyzer()
 syntax = SyntaxAnalyzer(tokens)
 syntax.startRule()
-
