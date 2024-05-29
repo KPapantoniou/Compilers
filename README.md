@@ -22,3 +22,7 @@ To run this project, you need:
    - Execute the `cpyCompiler.py` script to compile the source code.
    ```sh
    python3 compiler.py test1.cpy
+### Developers
+- Konstantinos Papantoniou-Chatzigiosis
+- Natalia Michou
+
